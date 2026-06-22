@@ -127,6 +127,8 @@ export interface EvidencePacket {
 
 export interface AnalyzeSuccessResponse {
   success: true;
+  analysisMode: "live" | "demo";
+  generatedAt: string;
   repo: {
     owner: string;
     name: string;

@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     }
 
     if (typeof body.repoUrl !== "string" || !body.repoUrl.toLowerCase().includes("github.com")) {
-      return NextResponse.json<AnalyzeErrorResponse>({ success: false, error: "Enter a valid github.com repository URL." }, { status: 400 });
+      return NextResponse.json<AnalyzeErrorResponse>({ success: false, error: "Please enter a valid public GitHub repository URL." }, { status: 400 });
     }
     if (typeof body.targetRole !== "string") {
       return NextResponse.json<AnalyzeErrorResponse>({ success: false, error: "Select a valid target role." }, { status: 400 });
@@ -105,6 +105,8 @@ export async function POST(request: Request) {
 
     const response: AnalyzeSuccessResponse = {
       success: true,
+      analysisMode: "live",
+      generatedAt: new Date().toISOString(),
       repo: repoData,
       readmeSummaryInput: readme,
       files,
@@ -120,6 +122,11 @@ export async function POST(request: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not analyze this repository.";
     const status = message.includes("not found") ? 404 : message.includes("rate limit") ? 429 : 400;
-    return NextResponse.json<AnalyzeErrorResponse>({ success: false, error: message }, { status });
+    const publicMessage = status === 429
+      ? "GitHub rate limit reached. Try Demo Snapshot or wait before retrying live analysis."
+      : status === 404
+        ? "Repository not found or not public."
+        : message;
+    return NextResponse.json<AnalyzeErrorResponse>({ success: false, error: publicMessage }, { status });
   }
 }

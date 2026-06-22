@@ -3,6 +3,7 @@
 import { FormEvent, ReactNode, useState } from "react";
 import type { AnalyzeResponse, AnalyzeSuccessResponse, OpportunityMatch, SkillEvidence } from "@/types/project-dna";
 import { useRouter } from "next/navigation";
+import { demoScenarios } from "@/data/demo-results";
 
 const REPORT_STORAGE_KEY = "projectdna_latest_report";
 
@@ -153,12 +154,12 @@ export default function Home() {
     try {
       parsedUrl = new URL(repoUrl.trim());
     } catch {
-      setError("Enter a valid public GitHub repository URL.");
+      setError("Please enter a valid public GitHub repository URL.");
       return;
     }
 
     if (parsedUrl.hostname !== "github.com" && !parsedUrl.hostname.endsWith(".github.com")) {
-      setError("The repository URL must be hosted on github.com.");
+      setError("Please enter a valid public GitHub repository URL.");
       return;
     }
 
@@ -176,7 +177,13 @@ export default function Home() {
       });
       const result = (await response.json()) as AnalyzeResponse;
       if (!response.ok || !result.success) {
-        throw new Error(result.success ? "Could not analyze this repository." : result.error);
+        const fallback = result.success ? "Could not analyze this repository." : result.error;
+        const message = response.status === 403 || response.status === 429
+          ? "GitHub rate limit reached. Try Demo Snapshot or wait before retrying live analysis."
+          : response.status === 404
+            ? "Repository not found or not public."
+            : fallback;
+        throw new Error(message);
       }
       setLoadingStage(loadingStages.length - 1);
       setAnalysis(result);
@@ -186,6 +193,17 @@ export default function Home() {
       window.clearInterval(stageTimer);
       setIsLoading(false);
     }
+  }
+
+  function loadDemoSnapshot(index: number) {
+    const scenario = demoScenarios[index];
+    setError("");
+    setCopiedSummary(false);
+    setIsLoading(false);
+    setRepoUrl(scenario.result.repo.url);
+    setSelectedRole(scenario.result.targetJob.title as (typeof roles)[number]);
+    setAnalysis(scenario.result);
+    window.setTimeout(() => document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
 
   function viewEvidenceReport() {
@@ -261,20 +279,24 @@ export default function Home() {
           )}
           <p className="px-2 pb-1 pt-3 text-xs text-slate-600">Public repositories only. No login required. GitHub API limits apply.</p>
         </form>
+        <div className="mx-auto mt-4 max-w-4xl rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.035] p-4 text-left">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">Try Demo Snapshot</p><p className="mt-1 text-xs text-slate-500">Precomputed examples load instantly and do not call GitHub.</p></div><div className="flex flex-wrap gap-2">{demoScenarios.map((scenario, index) => <button key={scenario.id} type="button" disabled={isLoading} onClick={() => loadDemoSnapshot(index)} aria-label={`Load ${scenario.label}`} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-cyan-400/25 hover:bg-cyan-400/[0.08] hover:text-white disabled:cursor-not-allowed disabled:opacity-50">{scenario.label}</button>)}</div></div>
+        </div>
       </section>
 
-      <section className="relative z-10 mx-auto max-w-7xl px-6 py-16 lg:px-8">
+      <section id="results" className="relative z-10 mx-auto max-w-7xl scroll-mt-6 px-6 py-16 lg:px-8">
         <div className="mb-8 flex items-end justify-between gap-6">
           <div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">Your evidence layer</p><h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">See capability, not connections.</h2></div>
-          {analysis && <span className="hidden text-xs text-emerald-400 sm:block">GitHub ingestion complete</span>}
+          {analysis && <span className={`hidden rounded-full border px-3 py-1.5 text-xs font-medium sm:block ${analysis.analysisMode === "demo" ? "border-cyan-400/20 bg-cyan-400/[0.07] text-cyan-300" : "border-emerald-400/20 bg-emerald-400/[0.07] text-emerald-300"}`}>{analysis.analysisMode === "demo" ? "Demo snapshot" : "Live GitHub analysis"}</span>}
         </div>
         {analysis && (
           <div className="mb-6 overflow-hidden rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.035]">
             <div className="flex flex-col gap-5 p-6 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300"><span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />GitHub ingestion complete</div>
+                <div className={`mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] ${analysis.analysisMode === "demo" ? "text-cyan-300" : "text-emerald-300"}`}><span className={`h-2 w-2 rounded-full ${analysis.analysisMode === "demo" ? "bg-cyan-400" : "bg-emerald-400"}`} />{analysis.analysisMode === "demo" ? <>Demo snapshot &mdash; no GitHub API used.</> : "Live GitHub analysis"}</div>
                 <a href={analysis.repo.url} target="_blank" rel="noreferrer" className="text-xl font-semibold text-white transition hover:text-violet-200">{analysis.repo.fullName}</a>
                 <p className="mt-2 max-w-2xl text-sm text-slate-400">Prepared as evidence for <span className="text-slate-200">{analysis.targetJob.title}</span>{analysis.repo.description ? ` / ${analysis.repo.description}` : ""}</p>
+                <p className="mt-2 text-xs text-slate-600">Generated {new Date(analysis.generatedAt).toLocaleString()}</p>
               </div>
               <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-4 lg:min-w-[520px]">
                 <div className="bg-[#0c1110] p-4"><p className="text-xs text-slate-500">Evidence files</p><p className="mt-1 text-lg font-semibold text-white">{analysis.fileTreeSummary.selectedFiles}</p></div>
@@ -287,7 +309,7 @@ export default function Home() {
         )}
         {analysis ? (
           <div className="mb-8 space-y-6">
-            {analysis.analysis.confidence < 50 && <div className="rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm text-amber-200">Low confidence analysis - not enough public evidence found.</div>}
+            {analysis.analysis.confidence < 40 && <div role="status" className="rounded-xl border border-amber-400/25 bg-amber-400/[0.07] px-5 py-4 text-sm text-amber-200"><span className="font-semibold">Low confidence:</span> ProjectDNA only found limited public evidence in this repository.<span className="mt-1 block text-xs text-amber-200/70">This repo does not contain enough public evidence for a confident assessment.</span></div>}
             <div className="grid gap-4 md:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><p className="text-xs text-slate-500">Project complexity</p><div className="mt-3 flex items-end justify-between"><p className="text-xl font-semibold capitalize text-white">{analysis.analysis.projectComplexity.level}</p><p className="text-2xl font-semibold text-violet-300">{analysis.analysis.projectComplexity.score}<span className="text-xs text-slate-600">/100</span></p></div></div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><p className="text-xs text-slate-500">Primary domain</p><p className="mt-3 text-xl font-semibold text-white">{analysis.analysis.domainClassification.primaryDomain}</p><p className="mt-1 truncate text-xs text-slate-500">{analysis.analysis.domainClassification.secondaryDomains.join(" / ") || "No secondary domain"}</p></div>
@@ -389,11 +411,16 @@ export default function Home() {
       </section>
 
       <section className="relative z-10 mx-auto max-w-7xl px-6 py-24 lg:px-8">
-        <div className="mb-10 max-w-xl"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">How it works</p><h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">From commits to credible signals.</h2></div>
-        <div className="flex flex-col gap-4 md:flex-row">
-          <FlowStep number="01" title="GitHub" text="Paste the public repository that best represents what you can build." />
-          <FlowStep number="02" title="Evidence" text="Turn implementation choices and project structure into clear skill signals." />
-          <FlowStep number="03" title="Opportunity" text="Connect those signals to a target role, expose gaps, and choose what to build next." />
+        <div className="mb-10 max-w-2xl"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">How it works</p><h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">A deterministic evidence pipeline, not a chatbot.</h2><p className="mt-4 text-sm leading-6 text-slate-500">Every result travels through inspectable local rules, from public repository input to an evidence packet.</p></div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+          <FlowStep number="01" title="GitHub ingestion" text="Reads public metadata, README, file tree, and bounded code snippets." />
+          <FlowStep number="02" title="Skill extraction" text="Detects skills from languages, dependencies, paths, and implementation patterns." />
+          <FlowStep number="03" title="Opportunity scoring" text="Applies a custom weighted formula against seeded role requirements." />
+          <FlowStep number="04" title="Gap-driven build" text="Turns missing evidence and weak quality signals into a concrete next project." />
+          <FlowStep number="05" title="Evidence packet" text="Packages repository signals, honest limitations, and next steps for sharing." />
+        </div>
+        <div className="mt-6 overflow-hidden rounded-3xl border border-violet-400/20 bg-gradient-to-r from-violet-500/[0.08] to-cyan-500/[0.04] p-6 sm:p-8">
+          <div className="grid gap-7 lg:grid-cols-[260px_1fr] lg:items-center"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">Transparent scoring</p><h3 className="mt-3 text-2xl font-semibold text-white">Match Score</h3><p className="mt-2 text-sm text-slate-500">Five weighted signals. No hidden model.</p></div><div className="grid gap-3 sm:grid-cols-5">{[["45%", "Required skill coverage"], ["20%", "Preferred skill coverage"], ["20%", "Evidence strength"], ["10%", "Domain alignment"], ["5%", "Complexity relevance"]].map(([weight, label]) => <div key={label} className="rounded-xl border border-white/10 bg-black/20 p-4"><p className="text-xl font-semibold text-cyan-300">{weight}</p><p className="mt-2 text-xs leading-5 text-slate-400">{label}</p></div>)}</div></div>
         </div>
       </section>
 
@@ -412,7 +439,7 @@ export default function Home() {
         <div className="mx-auto mt-10 grid max-w-2xl gap-3 sm:grid-cols-3"><FeaturePill>Not a resume builder</FeaturePill><FeaturePill>Not a chatbot</FeaturePill><FeaturePill>Evidence-first opportunity access</FeaturePill></div>
       </section>
 
-      <footer className="relative z-10 border-t border-white/10 px-6 py-8"><div className="mx-auto flex max-w-7xl items-center justify-between text-xs text-slate-600"><span className="flex items-center gap-2 text-slate-400"><Mark className="h-4 w-4" /> ProjectDNA</span><span>Built for Theme B5</span></div></footer>
+      <footer className="relative z-10 border-t border-white/10 px-6 py-8"><div className="mx-auto flex max-w-7xl flex-col gap-4 text-xs text-slate-600 sm:flex-row sm:items-center sm:justify-between"><span className="flex shrink-0 items-center gap-2 text-slate-400"><Mark className="h-4 w-4" /> ProjectDNA</span><p className="max-w-3xl leading-5 sm:text-right">ProjectDNA analyses public repository evidence only. It does not guarantee employment outcomes and should be used as a capability signal, not a final hiring decision.</p></div></footer>
     </main>
   );
 }

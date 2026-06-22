@@ -103,7 +103,7 @@ export default function LatestReportPage() {
 
       <div className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-16">
         <div className="max-w-4xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">ProjectDNA Evidence Packet</p>
+          <div className="flex flex-wrap items-center gap-3"><p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">ProjectDNA Evidence Packet</p><span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${report.analysisMode === "demo" ? "border-cyan-400/20 bg-cyan-400/[0.07] text-cyan-300" : "border-emerald-400/20 bg-emerald-400/[0.07] text-emerald-300"}`}>{report.analysisMode === "demo" ? "Demo snapshot" : "Live GitHub analysis"}</span></div>
           <h1 className="mt-5 text-4xl font-semibold tracking-[-0.035em] text-white sm:text-6xl">{evidencePacket.headline}</h1>
           <p className="mt-5 text-sm font-medium text-slate-300">Replacing social capital with demonstrated potential.</p>
           <p className="mt-6 max-w-3xl text-base leading-7 text-slate-400">{evidencePacket.summary}</p>
