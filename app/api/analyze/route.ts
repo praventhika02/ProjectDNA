@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { findSeedJob } from "@/data/seed-jobs";
+import { findSeedJob, seedJobs } from "@/data/seed-jobs";
 import {
   fetchReadme,
   fetchRepoMetadata,
@@ -12,6 +12,7 @@ import {
 } from "@/lib/github";
 import type { AnalyzeErrorResponse, AnalyzeSuccessResponse } from "@/types/project-dna";
 import { extractSkills } from "@/lib/skill-extractor";
+import { matchOpportunities } from "@/lib/opportunity-matcher";
 
 export const runtime = "nodejs";
 
@@ -81,6 +82,14 @@ export async function POST(request: Request) {
     };
     const fileTreeSummary = { totalFiles: blobs.length, selectedFiles: files.length, topExtensions, notablePaths };
     const analysis = extractSkills({ repo: repoData, readmeSummaryInput: readme, files, fileTreeSummary });
+    const opportunity = matchOpportunities({
+      detectedSkills: analysis.detectedSkills,
+      qualitySignals: analysis.qualitySignals,
+      projectComplexity: analysis.projectComplexity,
+      domainClassification: analysis.domainClassification,
+      targetRole: targetJob,
+      allJobs: seedJobs,
+    });
 
     const response: AnalyzeSuccessResponse = {
       success: true,
@@ -90,6 +99,7 @@ export async function POST(request: Request) {
       fileTreeSummary,
       targetJob,
       analysis,
+      opportunity,
     };
 
     return NextResponse.json(response);

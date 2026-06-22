@@ -55,6 +55,41 @@ export interface DeterministicAnalysis {
   confidence: number;
 }
 
+export interface MatchedSkill {
+  jobSkill: string;
+  matchedRepoSkill: string;
+  strength: number;
+  evidence: string[];
+  sourceFiles: string[];
+}
+
+export interface OpportunityMatch {
+  jobId: string;
+  title: string;
+  company: string;
+  matchScore: number;
+  readinessLevel: "low" | "emerging" | "strong" | "high";
+  matchedSkills: MatchedSkill[];
+  missingRequiredSkills: string[];
+  missingPreferredSkills: string[];
+  evidenceStrength: number;
+  explanation: string;
+}
+
+export interface GapAnalysis {
+  strongestEvidence: string[];
+  criticalGaps: string[];
+  improvementAreas: string[];
+  nextBestRole: string;
+  overallAdvice: string;
+}
+
+export interface OpportunityAnalysis {
+  targetMatch: OpportunityMatch;
+  alternativeMatches: OpportunityMatch[];
+  gapAnalysis: GapAnalysis;
+}
+
 export interface AnalyzeSuccessResponse {
   success: true;
   repo: {
@@ -78,6 +113,7 @@ export interface AnalyzeSuccessResponse {
   };
   targetJob: SeedJob;
   analysis: DeterministicAnalysis;
+  opportunity: OpportunityAnalysis;
 }
 
 export interface AnalyzeErrorResponse {

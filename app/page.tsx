@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, ReactNode, useState } from "react";
-import type { AnalyzeResponse, AnalyzeSuccessResponse, SkillEvidence } from "@/types/project-dna";
+import type { AnalyzeResponse, AnalyzeSuccessResponse, OpportunityMatch, SkillEvidence } from "@/types/project-dna";
 
 const roles = [
   "AI Engineer Intern",
@@ -50,14 +50,14 @@ function ResultCard({ title }: { title: string }) {
   return (
     <article className="group relative min-h-52 overflow-hidden rounded-2xl border border-white/10 bg-[#0d0d16]/80 p-6 transition duration-300 hover:border-white/20">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-500/50 via-cyan-400/30 to-transparent" />
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Coming in analysis</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Coming next</p>
       <h3 className="mt-4 text-lg font-semibold text-slate-300">{title}</h3>
       <div className="mt-6 space-y-3">
         <div className="h-3 rounded bg-white/[0.055]" />
         <div className="h-3 w-5/6 rounded bg-white/[0.055]" />
         <div className="h-3 w-2/3 rounded bg-white/[0.055]" />
       </div>
-      <p className="absolute bottom-5 text-xs text-slate-600">Opportunity analysis not yet enabled</p>
+      <p className="absolute bottom-5 text-xs text-slate-600">Generation not yet enabled</p>
     </article>
   );
 }
@@ -83,6 +83,16 @@ function SkillCard({ skill }: { skill: SkillEvidence }) {
         {skill.evidence.slice(0, 2).map((line) => <li key={line} className="flex gap-2 text-xs leading-5 text-slate-400"><span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-cyan-400" />{line}</li>)}
       </ul>
     </article>
+  );
+}
+
+function AlternativeMatchCard({ match }: { match: OpportunityMatch }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+      <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-medium text-white">{match.title}</p><p className="mt-1 text-xs text-slate-600">{match.company}</p></div><span className="text-lg font-semibold text-violet-300">{match.matchScore}%</span></div>
+      <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/[0.06]"><div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style={{ width: `${match.matchScore}%` }} /></div>
+      <p className="mt-3 text-xs capitalize text-slate-500">{match.readinessLevel} readiness / {match.matchedSkills.length} matched requirements</p>
+    </div>
   );
 }
 
@@ -148,8 +158,6 @@ export default function Home() {
   }
 
   const comingNextTitles = [
-    "Opportunity Match",
-    "Missing Gaps",
     "Recommended Portfolio Project",
     "Shareable Evidence Packet",
   ];
@@ -247,10 +255,47 @@ export default function Home() {
                 {analysis.analysis.qualitySignals.map((signal) => <div key={signal.signal}><div className="mb-2 flex items-center justify-between gap-4"><p className="text-sm font-medium text-slate-300">{signal.signal}</p><span className="text-xs text-slate-500">{signal.score}/100</span></div><div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]"><div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style={{ width: `${signal.score}%` }} /></div><p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-600">{signal.evidence[0]}</p></div>)}
               </div>
             </div>
+            <div className="overflow-hidden rounded-3xl border border-violet-400/20 bg-[#0d0d16]/90">
+              <div className="grid lg:grid-cols-[1fr_240px]">
+                <div className="p-6 sm:p-8">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">Opportunity Match</p>
+                  <h3 className="mt-3 text-2xl font-semibold text-white">{analysis.opportunity.targetMatch.title}</h3>
+                  <p className="mt-1 text-sm text-slate-500">{analysis.opportunity.targetMatch.company}</p>
+                  <p className="mt-5 max-w-3xl text-sm leading-6 text-slate-400">{analysis.opportunity.targetMatch.explanation}</p>
+                </div>
+                <div className="border-t border-white/10 bg-gradient-to-br from-violet-500/10 to-cyan-500/5 p-6 lg:border-l lg:border-t-0">
+                  <p className="text-xs text-slate-500">Calculated match</p><p className="mt-2 text-5xl font-semibold tracking-tight text-white">{analysis.opportunity.targetMatch.matchScore}<span className="text-lg text-slate-500">%</span></p>
+                  <p className="mt-3 inline-flex rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1 text-xs font-medium capitalize text-violet-200">{analysis.opportunity.targetMatch.readinessLevel} readiness</p>
+                  <p className="mt-5 text-xs text-slate-500">Evidence strength <span className="float-right text-slate-300">{analysis.opportunity.targetMatch.evidenceStrength}%</span></p>
+                </div>
+              </div>
+              <div className="border-t border-white/10 p-6 sm:p-8">
+                <div className="grid gap-8 lg:grid-cols-[1.35fr_1fr]">
+                  <div>
+                    <h4 className="text-sm font-semibold text-white">Matched skills</h4>
+                    {analysis.opportunity.targetMatch.matchedSkills.length ? <div className="mt-4 space-y-3">{analysis.opportunity.targetMatch.matchedSkills.map((match) => <div key={`${match.jobSkill}-${match.matchedRepoSkill}`} className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-4"><div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm text-slate-200">{match.jobSkill} <span className="text-slate-600">matched by</span> <span className="text-cyan-300">{match.matchedRepoSkill}</span></p><span className="text-xs text-slate-500">{match.strength}% strength</span></div><p className="mt-2 text-xs leading-5 text-slate-500">{match.evidence[0]}</p></div>)}</div> : <p className="mt-4 rounded-xl border border-dashed border-white/10 p-5 text-sm text-slate-500">No role requirements have defensible repository evidence yet.</p>}
+                  </div>
+                  <div className="space-y-6">
+                    <div><h4 className="text-sm font-semibold text-white">Missing required skills</h4><div className="mt-3 flex flex-wrap gap-2">{analysis.opportunity.targetMatch.missingRequiredSkills.length ? analysis.opportunity.targetMatch.missingRequiredSkills.map((skill) => <span key={skill} className="rounded-full border border-rose-400/20 bg-rose-400/[0.07] px-3 py-1.5 text-xs text-rose-200">{skill}</span>) : <span className="text-xs text-emerald-300">No required skill gaps detected</span>}</div></div>
+                    <div><h4 className="text-sm font-semibold text-white">Missing preferred skills</h4><div className="mt-3 flex flex-wrap gap-2">{analysis.opportunity.targetMatch.missingPreferredSkills.length ? analysis.opportunity.targetMatch.missingPreferredSkills.map((skill) => <span key={skill} className="rounded-full border border-amber-400/20 bg-amber-400/[0.06] px-3 py-1.5 text-xs text-amber-200">{skill}</span>) : <span className="text-xs text-emerald-300">No preferred skill gaps detected</span>}</div></div>
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-white/10 p-6 sm:p-8"><h4 className="text-sm font-semibold text-white">Alternative role matches</h4><div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{analysis.opportunity.alternativeMatches.map((match) => <AlternativeMatchCard key={match.jobId} match={match} />)}</div></div>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-white/[0.025] p-6 sm:p-8">
+              <div className="mb-7"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Gap Analysis</p><h3 className="mt-2 text-2xl font-semibold text-white">What would make the evidence stronger</h3><p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">{analysis.opportunity.gapAnalysis.overallAdvice}</p></div>
+              <div className="grid gap-6 lg:grid-cols-3">
+                <div><h4 className="text-sm font-semibold text-emerald-300">Strongest evidence</h4><div className="mt-3 space-y-2">{analysis.opportunity.gapAnalysis.strongestEvidence.length ? analysis.opportunity.gapAnalysis.strongestEvidence.map((item) => <p key={item} className="text-xs leading-5 text-slate-400">{item}</p>) : <p className="text-xs text-slate-600">No matched evidence available.</p>}</div></div>
+                <div><h4 className="text-sm font-semibold text-rose-300">Critical gaps</h4><div className="mt-3 space-y-2">{analysis.opportunity.gapAnalysis.criticalGaps.length ? analysis.opportunity.gapAnalysis.criticalGaps.map((item) => <p key={item} className="text-xs leading-5 text-slate-400">{item}</p>) : <p className="text-xs text-emerald-300">No critical required gaps detected.</p>}</div></div>
+                <div><h4 className="text-sm font-semibold text-amber-300">Improvement areas</h4><div className="mt-3 space-y-2">{analysis.opportunity.gapAnalysis.improvementAreas.map((item) => <p key={item} className="text-xs leading-5 text-slate-400">{item}</p>)}</div></div>
+              </div>
+              <div className="mt-7 rounded-xl border border-cyan-400/15 bg-cyan-400/[0.04] px-4 py-3 text-sm text-cyan-100"><span className="mr-2 text-xs font-semibold uppercase tracking-wider text-cyan-400">Next best role</span>{analysis.opportunity.gapAnalysis.nextBestRole}</div>
+            </div>
           </div>
-        ) : <div className="mb-4"><ResultCard title="Skill Evidence" /></div>}
+        ) : <div className="mb-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{["Skill Evidence", "Opportunity Match", "Missing Gaps"].map((title) => <ResultCard key={title} title={title} />)}</div>}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {comingNextTitles.map((title, index) => <div key={title} className={index === 2 ? "lg:col-span-2" : ""}><ResultCard title={title} /></div>)}
+          {comingNextTitles.map((title) => <div key={title}><ResultCard title={title} /></div>)}
         </div>
       </section>
 
