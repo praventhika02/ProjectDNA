@@ -14,6 +14,7 @@ import type { AnalyzeErrorResponse, AnalyzeSuccessResponse } from "@/types/proje
 import { extractSkills } from "@/lib/skill-extractor";
 import { matchOpportunities } from "@/lib/opportunity-matcher";
 import { generatePortfolioProject } from "@/lib/project-generator";
+import { generateEvidencePacket } from "@/lib/evidence-packet";
 
 export const runtime = "nodejs";
 
@@ -100,6 +101,7 @@ export async function POST(request: Request) {
       projectComplexity: analysis.projectComplexity,
       domainClassification: analysis.domainClassification,
     });
+    const evidencePacket = generateEvidencePacket({ repo: repoData, analysis, opportunity, portfolioProject, targetJob });
 
     const response: AnalyzeSuccessResponse = {
       success: true,
@@ -111,6 +113,7 @@ export async function POST(request: Request) {
       analysis,
       opportunity,
       portfolioProject,
+      evidencePacket,
     };
 
     return NextResponse.json(response);

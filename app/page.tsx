@@ -2,6 +2,25 @@
 
 import { FormEvent, ReactNode, useState } from "react";
 import type { AnalyzeResponse, AnalyzeSuccessResponse, OpportunityMatch, SkillEvidence } from "@/types/project-dna";
+import { useRouter } from "next/navigation";
+
+const REPORT_STORAGE_KEY = "projectdna_latest_report";
+
+async function copyText(text: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  const copied = document.execCommand("copy");
+  textarea.remove();
+  if (!copied) throw new Error("Clipboard copy failed");
+}
 
 const roles = [
   "AI Engineer Intern",
@@ -115,17 +134,20 @@ function FeaturePill({ children }: { children: ReactNode }) {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [repoUrl, setRepoUrl] = useState("");
   const [selectedRole, setSelectedRole] = useState<(typeof roles)[number]>(roles[0]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [analysis, setAnalysis] = useState<AnalyzeSuccessResponse | null>(null);
   const [loadingStage, setLoadingStage] = useState(0);
+  const [copiedSummary, setCopiedSummary] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setAnalysis(null);
+    setCopiedSummary(false);
 
     let parsedUrl: URL;
     try {
@@ -166,9 +188,27 @@ export default function Home() {
     }
   }
 
-  const comingNextTitles = [
-    "Shareable Evidence Packet",
-  ];
+  function viewEvidenceReport() {
+    if (!analysis) return;
+    try {
+      localStorage.setItem(REPORT_STORAGE_KEY, JSON.stringify(analysis));
+      router.push("/report/latest");
+    } catch {
+      setError("Could not save the report in this browser. Check local storage permissions and try again.");
+    }
+  }
+
+  async function copyRecruiterSummary() {
+    if (!analysis) return;
+    const text = `${analysis.evidencePacket.recruiterPitch}\nMatch score: ${analysis.opportunity.targetMatch.matchScore}% (${analysis.opportunity.targetMatch.readinessLevel} readiness)\n${analysis.portfolioProject.portfolioPitch}`;
+    try {
+      await copyText(text);
+      setCopiedSummary(true);
+      window.setTimeout(() => setCopiedSummary(false), 2500);
+    } catch {
+      setError("Could not copy the summary. Your browser may have blocked clipboard access.");
+    }
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#05050a] text-slate-100">
@@ -328,11 +368,24 @@ export default function Home() {
               </div>
               <div className="relative p-6 sm:p-9"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Portfolio pitch</p><blockquote className="mt-3 max-w-4xl text-lg font-medium leading-8 text-white">&ldquo;{analysis.portfolioProject.portfolioPitch}&rdquo;</blockquote></div>
             </div>
+            <div className="overflow-hidden rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-[#0c1118] to-[#0c0a14]">
+              <div className="grid lg:grid-cols-[1fr_320px]">
+                <div className="p-6 sm:p-9">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">Shareable Evidence Packet</p>
+                  <h3 className="mt-4 max-w-3xl text-2xl font-semibold tracking-tight text-white sm:text-3xl">{analysis.evidencePacket.headline}</h3>
+                  <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-400">{analysis.evidencePacket.summary}</p>
+                  <div className="mt-6 rounded-2xl border border-white/10 bg-black/25 p-5"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-300">Recruiter summary</p><p className="mt-3 text-sm leading-6 text-slate-200">{analysis.evidencePacket.recruiterPitch}</p></div>
+                  <div className="mt-6 flex flex-wrap gap-3"><button type="button" onClick={viewEvidenceReport} className="flex h-11 items-center gap-2 rounded-xl bg-white px-5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-100">View Evidence Report <ArrowIcon /></button><button type="button" onClick={copyRecruiterSummary} className="h-11 rounded-xl border border-white/10 bg-white/5 px-5 text-sm font-medium text-slate-200 transition hover:border-white/20 hover:bg-white/10">{copiedSummary ? "Summary copied" : "Copy Recruiter Summary"}</button></div>
+                  <p className="mt-3 text-xs text-slate-600">The full report is saved only in this browser.</p>
+                </div>
+                <div className="border-t border-white/10 bg-white/[0.025] p-6 lg:border-l lg:border-t-0 sm:p-8">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Proof at a glance</p>
+                  <div className="mt-5 space-y-5">{analysis.evidencePacket.proofPoints.slice(0, 4).map((point) => <div key={point.label}><p className="text-xs text-slate-600">{point.label}</p><p className="mt-1 text-lg font-semibold capitalize text-white">{point.value}</p><p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{point.evidence}</p></div>)}</div>
+                </div>
+              </div>
+            </div>
           </div>
-        ) : <div className="mb-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{["Skill Evidence", "Opportunity Match", "Missing Gaps", "Recommended Portfolio Project"].map((title) => <ResultCard key={title} title={title} />)}</div>}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {comingNextTitles.map((title) => <div key={title}><ResultCard title={title} /></div>)}
-        </div>
+        ) : <div className="mb-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{["Skill Evidence", "Opportunity Match", "Missing Gaps", "Recommended Portfolio Project", "Shareable Evidence Packet"].map((title) => <ResultCard key={title} title={title} />)}</div>}
       </section>
 
       <section className="relative z-10 mx-auto max-w-7xl px-6 py-24 lg:px-8">

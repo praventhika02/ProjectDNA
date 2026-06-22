@@ -107,6 +107,24 @@ export interface PortfolioProjectRecommendation {
   portfolioPitch: string;
 }
 
+export interface EvidencePacketProofPoint {
+  label: string;
+  value: string;
+  evidence: string;
+}
+
+export interface EvidencePacket {
+  headline: string;
+  summary: string;
+  recruiterPitch: string;
+  evidenceHighlights: string[];
+  opportunityFit: string;
+  gapNarrative: string;
+  recommendedNextBuild: string;
+  proofPoints: EvidencePacketProofPoint[];
+  credibilityNotes: string[];
+}
+
 export interface AnalyzeSuccessResponse {
   success: true;
   repo: {
@@ -132,6 +150,7 @@ export interface AnalyzeSuccessResponse {
   analysis: DeterministicAnalysis;
   opportunity: OpportunityAnalysis;
   portfolioProject: PortfolioProjectRecommendation;
+  evidencePacket: EvidencePacket;
 }
 
 export interface AnalyzeErrorResponse {
