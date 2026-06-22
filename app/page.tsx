@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, ReactNode, useState } from "react";
+import type { AnalyzeResponse, AnalyzeSuccessResponse } from "@/types/project-dna";
 
 const roles = [
   "AI Engineer Intern",
@@ -10,44 +11,12 @@ const roles = [
   "Product Engineer Intern",
 ] as const;
 
-type MockResult = {
-  title: string;
-  eyebrow: string;
-  content: string;
-  accent: string;
-};
-
-const sampleResults: MockResult[] = [
-  {
-    title: "Skill Evidence",
-    eyebrow: "3 signals found",
-    content: "TypeScript architecture, component design, and practical API integration backed by repository evidence.",
-    accent: "from-violet-500 to-fuchsia-400",
-  },
-  {
-    title: "Opportunity Match",
-    eyebrow: "Strong foundation",
-    content: "Your project demonstrates several core capabilities expected for this role, with room to deepen production readiness.",
-    accent: "from-cyan-400 to-blue-500",
-  },
-  {
-    title: "Missing Gaps",
-    eyebrow: "2 growth areas",
-    content: "Add automated testing and measurable performance outcomes to make your evidence more convincing.",
-    accent: "from-amber-300 to-orange-500",
-  },
-  {
-    title: "Recommended Portfolio Project",
-    eyebrow: "Build next",
-    content: "Create a production-style analytics workspace with tested data pipelines, role-based views, and documented tradeoffs.",
-    accent: "from-emerald-400 to-teal-500",
-  },
-  {
-    title: "Shareable Evidence Packet",
-    eyebrow: "Ready to generate",
-    content: "A concise, recruiter-friendly summary connecting your implementation choices to real role requirements.",
-    accent: "from-pink-400 to-rose-500",
-  },
+const loadingStages = [
+  "Validating GitHub URL",
+  "Fetching repository metadata",
+  "Reading README and file tree",
+  "Selecting evidence files",
+  "Preparing ProjectDNA analysis",
 ];
 
 function Mark({ className = "h-5 w-5" }: { className?: string }) {
@@ -77,28 +46,18 @@ function FlowStep({ number, title, text }: { number: string; title: string; text
   );
 }
 
-function ResultCard({ result }: { result?: MockResult }) {
+function ResultCard({ title }: { title: string }) {
   return (
     <article className="group relative min-h-52 overflow-hidden rounded-2xl border border-white/10 bg-[#0d0d16]/80 p-6 transition duration-300 hover:border-white/20">
-      {result ? (
-        <>
-          <div className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r ${result.accent}`} />
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">{result.eyebrow}</p>
-          <h3 className="mt-4 text-lg font-semibold text-white">{result.title}</h3>
-          <p className="mt-3 text-sm leading-6 text-slate-400">{result.content}</p>
-        </>
-      ) : (
-        <>
-          <div className="h-2 w-16 rounded-full bg-white/10" />
-          <div className="mt-7 h-5 w-3/5 rounded bg-white/10" />
-          <div className="mt-5 space-y-3">
-            <div className="h-3 rounded bg-white/[0.055]" />
-            <div className="h-3 w-5/6 rounded bg-white/[0.055]" />
-            <div className="h-3 w-2/3 rounded bg-white/[0.055]" />
-          </div>
-          <p className="absolute bottom-5 text-xs text-slate-600">Awaiting analysis</p>
-        </>
-      )}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-500/50 via-cyan-400/30 to-transparent" />
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Coming in analysis</p>
+      <h3 className="mt-4 text-lg font-semibold text-slate-300">{title}</h3>
+      <div className="mt-6 space-y-3">
+        <div className="h-3 rounded bg-white/[0.055]" />
+        <div className="h-3 w-5/6 rounded bg-white/[0.055]" />
+        <div className="h-3 w-2/3 rounded bg-white/[0.055]" />
+      </div>
+      <p className="absolute bottom-5 text-xs text-slate-600">Evidence extraction not yet enabled</p>
     </article>
   );
 }
@@ -117,12 +76,13 @@ export default function Home() {
   const [selectedRole, setSelectedRole] = useState<(typeof roles)[number]>(roles[0]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [mockResult, setMockResult] = useState<MockResult[] | null>(null);
+  const [analysis, setAnalysis] = useState<AnalyzeSuccessResponse | null>(null);
+  const [loadingStage, setLoadingStage] = useState(0);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
-    setMockResult(null);
+    setAnalysis(null);
 
     let parsedUrl: URL;
     try {
@@ -138,9 +98,29 @@ export default function Home() {
     }
 
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setMockResult(sampleResults);
-    setIsLoading(false);
+    setLoadingStage(0);
+    const stageTimer = window.setInterval(() => {
+      setLoadingStage((current) => Math.min(current + 1, loadingStages.length - 1));
+    }, 650);
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ repoUrl: repoUrl.trim(), targetRole: selectedRole }),
+      });
+      const result = (await response.json()) as AnalyzeResponse;
+      if (!response.ok || !result.success) {
+        throw new Error(result.success ? "Could not analyze this repository." : result.error);
+      }
+      setLoadingStage(loadingStages.length - 1);
+      setAnalysis(result);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Could not analyze this repository.");
+    } finally {
+      window.clearInterval(stageTimer);
+      setIsLoading(false);
+    }
   }
 
   const emptyCardTitles = [
@@ -194,20 +174,40 @@ export default function Home() {
             </button>
           </div>
           {error && <p role="alert" className="px-2 pb-1 pt-3 text-sm text-rose-400">{error}</p>}
-          <p className="px-2 pb-1 pt-3 text-xs text-slate-600">Public repositories only. No login required. Analysis is mocked in this prototype.</p>
+          {isLoading && (
+            <div className="px-2 pb-1 pt-4" aria-live="polite">
+              <div className="mb-2 flex items-center justify-between text-xs"><span className="font-medium text-violet-300">{loadingStages[loadingStage]}</span><span className="text-slate-600">{loadingStage + 1}/{loadingStages.length}</span></div>
+              <div className="h-1 overflow-hidden rounded-full bg-white/5"><div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 transition-all duration-500" style={{ width: `${((loadingStage + 1) / loadingStages.length) * 100}%` }} /></div>
+            </div>
+          )}
+          <p className="px-2 pb-1 pt-3 text-xs text-slate-600">Public repositories only. No login required. GitHub API limits apply.</p>
         </form>
       </section>
 
       <section className="relative z-10 mx-auto max-w-7xl px-6 py-16 lg:px-8">
         <div className="mb-8 flex items-end justify-between gap-6">
           <div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">Your evidence layer</p><h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">See capability, not connections.</h2></div>
-          {mockResult && <span className="hidden text-xs text-slate-500 sm:block">Mock analysis for {selectedRole}</span>}
+          {analysis && <span className="hidden text-xs text-emerald-400 sm:block">GitHub ingestion complete</span>}
         </div>
+        {analysis && (
+          <div className="mb-6 overflow-hidden rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.035]">
+            <div className="flex flex-col gap-5 p-6 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300"><span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />GitHub ingestion complete</div>
+                <a href={analysis.repo.url} target="_blank" rel="noreferrer" className="text-xl font-semibold text-white transition hover:text-violet-200">{analysis.repo.fullName}</a>
+                <p className="mt-2 max-w-2xl text-sm text-slate-400">Prepared as evidence for <span className="text-slate-200">{analysis.targetJob.title}</span>{analysis.repo.description ? ` · ${analysis.repo.description}` : ""}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-4 lg:min-w-[520px]">
+                <div className="bg-[#0c1110] p-4"><p className="text-xs text-slate-500">Evidence files</p><p className="mt-1 text-lg font-semibold text-white">{analysis.fileTreeSummary.selectedFiles}</p></div>
+                <div className="bg-[#0c1110] p-4"><p className="text-xs text-slate-500">Files scanned</p><p className="mt-1 text-lg font-semibold text-white">{analysis.fileTreeSummary.totalFiles}</p></div>
+                <div className="bg-[#0c1110] p-4"><p className="text-xs text-slate-500">Top language</p><p className="mt-1 truncate text-sm font-semibold text-white">{analysis.repo.language ?? "Mixed"}</p></div>
+                <div className="bg-[#0c1110] p-4"><p className="text-xs text-slate-500">Top extensions</p><p className="mt-1 truncate text-sm font-semibold text-white">{analysis.fileTreeSummary.topExtensions.slice(0, 3).map((item) => item.extension).join(" · ") || "None"}</p></div>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {(mockResult ?? emptyCardTitles).map((item, index) => {
-            const result = typeof item === "string" ? undefined : item;
-            return <div key={typeof item === "string" ? item : item.title} className={index === 3 ? "lg:col-span-2" : ""}><ResultCard result={result} /></div>;
-          })}
+          {emptyCardTitles.map((title, index) => <div key={title} className={index === 3 ? "lg:col-span-2" : ""}><ResultCard title={title} /></div>)}
         </div>
       </section>
 
