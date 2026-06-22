@@ -90,6 +90,23 @@ export interface OpportunityAnalysis {
   gapAnalysis: GapAnalysis;
 }
 
+export interface PortfolioProjectRecommendation {
+  title: string;
+  summary: string;
+  whyThisProject: string;
+  targetRole: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  estimatedTime: string;
+  skillsToProve: string[];
+  gapsAddressed: string[];
+  features: string[];
+  technicalRequirements: string[];
+  deliverables: string[];
+  successCriteria: string[];
+  stretchGoals: string[];
+  portfolioPitch: string;
+}
+
 export interface AnalyzeSuccessResponse {
   success: true;
   repo: {
@@ -114,6 +131,7 @@ export interface AnalyzeSuccessResponse {
   targetJob: SeedJob;
   analysis: DeterministicAnalysis;
   opportunity: OpportunityAnalysis;
+  portfolioProject: PortfolioProjectRecommendation;
 }
 
 export interface AnalyzeErrorResponse {

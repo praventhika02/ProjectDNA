@@ -96,6 +96,15 @@ function AlternativeMatchCard({ match }: { match: OpportunityMatch }) {
   );
 }
 
+function ProjectList({ title, items, accent = "text-violet-300" }: { title: string; items: string[]; accent?: string }) {
+  return (
+    <div>
+      <h4 className={`text-sm font-semibold ${accent}`}>{title}</h4>
+      <div className="mt-3 space-y-2">{items.map((item) => <div key={item} className="flex gap-2.5 text-xs leading-5 text-slate-400"><span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-current opacity-70" />{item}</div>)}</div>
+    </div>
+  );
+}
+
 function FeaturePill({ children }: { children: ReactNode }) {
   return (
     <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-slate-300">
@@ -158,7 +167,6 @@ export default function Home() {
   }
 
   const comingNextTitles = [
-    "Recommended Portfolio Project",
     "Shareable Evidence Packet",
   ];
 
@@ -292,8 +300,36 @@ export default function Home() {
               </div>
               <div className="mt-7 rounded-xl border border-cyan-400/15 bg-cyan-400/[0.04] px-4 py-3 text-sm text-cyan-100"><span className="mr-2 text-xs font-semibold uppercase tracking-wider text-cyan-400">Next best role</span>{analysis.opportunity.gapAnalysis.nextBestRole}</div>
             </div>
+            <div className="relative overflow-hidden rounded-3xl border border-fuchsia-400/25 bg-[#0c0912] shadow-[0_0_80px_rgba(168,85,247,0.1)]">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_90%_0%,rgba(34,211,238,0.12),transparent_32%),radial-gradient(circle_at_10%_10%,rgba(192,38,211,0.13),transparent_38%)]" />
+              <div className="relative border-b border-white/10 p-6 sm:p-9">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="max-w-3xl">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-300">Recommended Portfolio Project</p>
+                    <h3 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">{analysis.portfolioProject.title}</h3>
+                    <p className="mt-4 text-sm leading-6 text-slate-400">{analysis.portfolioProject.summary}</p>
+                  </div>
+                  <div className="flex shrink-0 flex-wrap gap-2 lg:max-w-56 lg:justify-end"><span className="rounded-full border border-fuchsia-400/25 bg-fuchsia-400/10 px-3 py-1.5 text-xs font-medium capitalize text-fuchsia-200">{analysis.portfolioProject.difficulty}</span><span className="rounded-full border border-cyan-400/20 bg-cyan-400/[0.07] px-3 py-1.5 text-xs font-medium text-cyan-200">{analysis.portfolioProject.estimatedTime}</span><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300">{analysis.portfolioProject.targetRole}</span></div>
+                </div>
+                <div className="mt-7 rounded-2xl border border-white/10 bg-black/25 p-5"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-300">Why this project</p><p className="mt-3 text-sm leading-6 text-slate-300">{analysis.portfolioProject.whyThisProject}</p></div>
+                <div className="mt-6 grid gap-5 md:grid-cols-2">
+                  <div><p className="text-xs font-semibold text-white">Skills to prove</p><div className="mt-3 flex flex-wrap gap-2">{analysis.portfolioProject.skillsToProve.map((skill) => <span key={skill} className="rounded-full border border-violet-400/20 bg-violet-400/[0.07] px-3 py-1.5 text-xs text-violet-200">{skill}</span>)}</div></div>
+                  <div><p className="text-xs font-semibold text-white">Gaps addressed</p><div className="mt-3 flex flex-wrap gap-2">{analysis.portfolioProject.gapsAddressed.map((gap) => <span key={gap} className="rounded-full border border-amber-400/20 bg-amber-400/[0.06] px-3 py-1.5 text-xs text-amber-100">{gap}</span>)}</div></div>
+                </div>
+              </div>
+              <div className="relative grid gap-8 border-b border-white/10 p-6 sm:p-9 lg:grid-cols-2">
+                <ProjectList title="Core features" items={analysis.portfolioProject.features} accent="text-fuchsia-300" />
+                <ProjectList title="Technical requirements" items={analysis.portfolioProject.technicalRequirements} accent="text-cyan-300" />
+              </div>
+              <div className="relative grid gap-8 border-b border-white/10 p-6 sm:p-9 lg:grid-cols-3">
+                <ProjectList title="Deliverables" items={analysis.portfolioProject.deliverables} accent="text-violet-300" />
+                <ProjectList title="Success criteria" items={analysis.portfolioProject.successCriteria} accent="text-emerald-300" />
+                <ProjectList title="Stretch goals" items={analysis.portfolioProject.stretchGoals} accent="text-amber-300" />
+              </div>
+              <div className="relative p-6 sm:p-9"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Portfolio pitch</p><blockquote className="mt-3 max-w-4xl text-lg font-medium leading-8 text-white">&ldquo;{analysis.portfolioProject.portfolioPitch}&rdquo;</blockquote></div>
+            </div>
           </div>
-        ) : <div className="mb-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{["Skill Evidence", "Opportunity Match", "Missing Gaps"].map((title) => <ResultCard key={title} title={title} />)}</div>}
+        ) : <div className="mb-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{["Skill Evidence", "Opportunity Match", "Missing Gaps", "Recommended Portfolio Project"].map((title) => <ResultCard key={title} title={title} />)}</div>}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {comingNextTitles.map((title) => <div key={title}><ResultCard title={title} /></div>)}
         </div>

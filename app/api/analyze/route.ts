@@ -13,6 +13,7 @@ import {
 import type { AnalyzeErrorResponse, AnalyzeSuccessResponse } from "@/types/project-dna";
 import { extractSkills } from "@/lib/skill-extractor";
 import { matchOpportunities } from "@/lib/opportunity-matcher";
+import { generatePortfolioProject } from "@/lib/project-generator";
 
 export const runtime = "nodejs";
 
@@ -90,6 +91,15 @@ export async function POST(request: Request) {
       targetRole: targetJob,
       allJobs: seedJobs,
     });
+    const portfolioProject = generatePortfolioProject({
+      targetJob,
+      targetMatch: opportunity.targetMatch,
+      gapAnalysis: opportunity.gapAnalysis,
+      detectedSkills: analysis.detectedSkills,
+      qualitySignals: analysis.qualitySignals,
+      projectComplexity: analysis.projectComplexity,
+      domainClassification: analysis.domainClassification,
+    });
 
     const response: AnalyzeSuccessResponse = {
       success: true,
@@ -100,6 +110,7 @@ export async function POST(request: Request) {
       targetJob,
       analysis,
       opportunity,
+      portfolioProject,
     };
 
     return NextResponse.json(response);
