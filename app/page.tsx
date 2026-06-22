@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, ReactNode, useState } from "react";
-import type { AnalyzeResponse, AnalyzeSuccessResponse } from "@/types/project-dna";
+import type { AnalyzeResponse, AnalyzeSuccessResponse, SkillEvidence } from "@/types/project-dna";
 
 const roles = [
   "AI Engineer Intern",
@@ -57,7 +57,31 @@ function ResultCard({ title }: { title: string }) {
         <div className="h-3 w-5/6 rounded bg-white/[0.055]" />
         <div className="h-3 w-2/3 rounded bg-white/[0.055]" />
       </div>
-      <p className="absolute bottom-5 text-xs text-slate-600">Evidence extraction not yet enabled</p>
+      <p className="absolute bottom-5 text-xs text-slate-600">Opportunity analysis not yet enabled</p>
+    </article>
+  );
+}
+
+function SkillCard({ skill }: { skill: SkillEvidence }) {
+  return (
+    <article className="rounded-2xl border border-white/10 bg-[#0d0d16]/90 p-5 transition hover:border-violet-400/25">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-300">{skill.category.replace("_", " / ")}</p>
+          <h4 className="mt-2 text-base font-semibold text-white">{skill.skill}</h4>
+        </div>
+        <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-medium text-slate-300">{skill.confidence}%</span>
+      </div>
+      <div className="mt-4 flex items-center gap-2">
+        <span className="text-xs text-slate-500">Proficiency</span>
+        <div className="flex gap-1" aria-label={`${skill.proficiency} out of 5`}>
+          {[1, 2, 3, 4, 5].map((level) => <span key={level} className={`h-1.5 w-5 rounded-full ${level <= skill.proficiency ? "bg-gradient-to-r from-violet-400 to-cyan-400" : "bg-white/10"}`} />)}
+        </div>
+        <span className="text-xs font-medium text-slate-300">{skill.proficiency}/5</span>
+      </div>
+      <ul className="mt-4 space-y-2">
+        {skill.evidence.slice(0, 2).map((line) => <li key={line} className="flex gap-2 text-xs leading-5 text-slate-400"><span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-cyan-400" />{line}</li>)}
+      </ul>
     </article>
   );
 }
@@ -123,8 +147,7 @@ export default function Home() {
     }
   }
 
-  const emptyCardTitles = [
-    "Skill Evidence",
+  const comingNextTitles = [
     "Opportunity Match",
     "Missing Gaps",
     "Recommended Portfolio Project",
@@ -195,19 +218,39 @@ export default function Home() {
               <div>
                 <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300"><span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />GitHub ingestion complete</div>
                 <a href={analysis.repo.url} target="_blank" rel="noreferrer" className="text-xl font-semibold text-white transition hover:text-violet-200">{analysis.repo.fullName}</a>
-                <p className="mt-2 max-w-2xl text-sm text-slate-400">Prepared as evidence for <span className="text-slate-200">{analysis.targetJob.title}</span>{analysis.repo.description ? ` · ${analysis.repo.description}` : ""}</p>
+                <p className="mt-2 max-w-2xl text-sm text-slate-400">Prepared as evidence for <span className="text-slate-200">{analysis.targetJob.title}</span>{analysis.repo.description ? ` / ${analysis.repo.description}` : ""}</p>
               </div>
               <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-4 lg:min-w-[520px]">
                 <div className="bg-[#0c1110] p-4"><p className="text-xs text-slate-500">Evidence files</p><p className="mt-1 text-lg font-semibold text-white">{analysis.fileTreeSummary.selectedFiles}</p></div>
                 <div className="bg-[#0c1110] p-4"><p className="text-xs text-slate-500">Files scanned</p><p className="mt-1 text-lg font-semibold text-white">{analysis.fileTreeSummary.totalFiles}</p></div>
                 <div className="bg-[#0c1110] p-4"><p className="text-xs text-slate-500">Top language</p><p className="mt-1 truncate text-sm font-semibold text-white">{analysis.repo.language ?? "Mixed"}</p></div>
-                <div className="bg-[#0c1110] p-4"><p className="text-xs text-slate-500">Top extensions</p><p className="mt-1 truncate text-sm font-semibold text-white">{analysis.fileTreeSummary.topExtensions.slice(0, 3).map((item) => item.extension).join(" · ") || "None"}</p></div>
+                <div className="bg-[#0c1110] p-4"><p className="text-xs text-slate-500">Top extensions</p><p className="mt-1 truncate text-sm font-semibold text-white">{analysis.fileTreeSummary.topExtensions.slice(0, 3).map((item) => item.extension).join(" / ") || "None"}</p></div>
               </div>
             </div>
           </div>
         )}
+        {analysis ? (
+          <div className="mb-8 space-y-6">
+            {analysis.analysis.confidence < 50 && <div className="rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm text-amber-200">Low confidence analysis - not enough public evidence found.</div>}
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><p className="text-xs text-slate-500">Project complexity</p><div className="mt-3 flex items-end justify-between"><p className="text-xl font-semibold capitalize text-white">{analysis.analysis.projectComplexity.level}</p><p className="text-2xl font-semibold text-violet-300">{analysis.analysis.projectComplexity.score}<span className="text-xs text-slate-600">/100</span></p></div></div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><p className="text-xs text-slate-500">Primary domain</p><p className="mt-3 text-xl font-semibold text-white">{analysis.analysis.domainClassification.primaryDomain}</p><p className="mt-1 truncate text-xs text-slate-500">{analysis.analysis.domainClassification.secondaryDomains.join(" / ") || "No secondary domain"}</p></div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><p className="text-xs text-slate-500">Analysis confidence</p><div className="mt-3 flex items-end justify-between"><p className="text-sm text-slate-400">Evidence coverage</p><p className="text-2xl font-semibold text-cyan-300">{analysis.analysis.confidence}%</p></div></div>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-5 sm:p-7">
+              <div className="mb-6"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">Skill Evidence</p><h3 className="mt-2 text-2xl font-semibold text-white">Signals grounded in this repository</h3><p className="mt-2 text-sm text-slate-500">Every result below comes from a manifest, file path, README, language count, or selected code snippet.</p></div>
+              {analysis.analysis.detectedSkills.length ? <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">{analysis.analysis.detectedSkills.slice(0, 12).map((skill) => <SkillCard key={`${skill.category}-${skill.skill}`} skill={skill} />)}</div> : <div className="rounded-xl border border-dashed border-white/10 p-8 text-center text-sm text-slate-400">No defensible skills were detected from the available public files. Add source code or project documentation and try again.</div>}
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-[#0d0d16]/80 p-5 sm:p-7">
+              <div className="mb-6"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">Code quality signals</p><h3 className="mt-2 text-xl font-semibold text-white">What the public evidence supports</h3></div>
+              <div className="grid gap-x-8 gap-y-5 md:grid-cols-2">
+                {analysis.analysis.qualitySignals.map((signal) => <div key={signal.signal}><div className="mb-2 flex items-center justify-between gap-4"><p className="text-sm font-medium text-slate-300">{signal.signal}</p><span className="text-xs text-slate-500">{signal.score}/100</span></div><div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]"><div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style={{ width: `${signal.score}%` }} /></div><p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-600">{signal.evidence[0]}</p></div>)}
+              </div>
+            </div>
+          </div>
+        ) : <div className="mb-4"><ResultCard title="Skill Evidence" /></div>}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {emptyCardTitles.map((title, index) => <div key={title} className={index === 3 ? "lg:col-span-2" : ""}><ResultCard title={title} /></div>)}
+          {comingNextTitles.map((title, index) => <div key={title} className={index === 2 ? "lg:col-span-2" : ""}><ResultCard title={title} /></div>)}
         </div>
       </section>
 

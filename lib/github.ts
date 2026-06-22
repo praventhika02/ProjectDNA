@@ -7,7 +7,7 @@ const MAX_README_CHARS = 6_000;
 const MAX_FETCHABLE_FILE_BYTES = 250_000;
 
 export const preferredExtensions = new Set([
-  ".ts", ".tsx", ".js", ".jsx", ".py", ".ipynb", ".java", ".cs", ".go", ".rs", ".sql", ".md", ".json", ".yml", ".yaml",
+  ".ts", ".tsx", ".js", ".jsx", ".py", ".ipynb", ".java", ".cs", ".go", ".rs", ".sql", ".md", ".json", ".yml", ".yaml", ".html", ".css", ".toml",
 ]);
 
 const ignoredSegments = new Set(["node_modules", "dist", "build", ".next", "public", "coverage", "vendor", "target"]);
@@ -141,11 +141,13 @@ export function isRelevantFile(file: GitHubTreeItem): boolean {
   const lowerPath = file.path.toLowerCase();
   if (lowerPath.split("/").some((segment) => ignoredSegments.has(segment))) return false;
   if (ignoredFiles.test(lowerPath)) return false;
-  return preferredExtensions.has(getExtension(lowerPath));
+  const filename = lowerPath.split("/").pop() ?? "";
+  const evidenceManifest = filename === "requirements.txt" || filename.startsWith("dockerfile") || filename === "makefile";
+  return evidenceManifest || preferredExtensions.has(getExtension(lowerPath));
 }
 
 export function selectRelevantFiles(tree: GitHubTreeItem[]): GitHubTreeItem[] {
-  const priorityNames = /(^|\/)(readme|package|tsconfig|requirements|pyproject|schema|main|index|app|page|route)\./i;
+  const priorityNames = /(^|\/)(readme|package|tsconfig|requirements|pyproject|schema|main|index|app|page|route|dockerfile)(\.|$)/i;
   const testPath = /(^|\/)(__tests__|tests?|specs?)(\/|\.)/i;
 
   return tree
@@ -154,9 +156,10 @@ export function selectRelevantFiles(tree: GitHubTreeItem[]): GitHubTreeItem[] {
       const depth = file.path.split("/").length - 1;
       const extension = getExtension(file.path);
       let score = 50 - Math.min(depth * 3, 15);
-      if (priorityNames.test(file.path)) score += 24;
-      if (testPath.test(file.path)) score += 10;
-      if ([".ts", ".tsx", ".py", ".java", ".go", ".rs", ".sql"].includes(extension)) score += 8;
+      if (priorityNames.test(file.path)) score += depth <= 1 ? 24 : 8;
+      if (/(^|\/)(src|lib|app|server|api|routes?)(\/|$)/i.test(file.path)) score += 10;
+      if (testPath.test(file.path)) score -= 4;
+      if ([".ts", ".tsx", ".js", ".jsx", ".py", ".java", ".go", ".rs", ".sql"].includes(extension)) score += 8;
       if (extension === ".json" || extension === ".md") score -= 5;
       return { file, score };
     })

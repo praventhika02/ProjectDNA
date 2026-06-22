@@ -11,6 +11,7 @@ import {
   selectRelevantFiles,
 } from "@/lib/github";
 import type { AnalyzeErrorResponse, AnalyzeSuccessResponse } from "@/types/project-dna";
+import { extractSkills } from "@/lib/skill-extractor";
 
 export const runtime = "nodejs";
 
@@ -61,23 +62,34 @@ export async function POST(request: Request) {
       .slice(0, 5)
       .map(([extension, count]) => ({ extension, count }));
 
+    const blobPaths = blobs.map((file) => file.path);
+    const configPaths = blobPaths.filter((path) => /^\.github\/workflows\/|(^|\/)(package\.json|requirements\.txt|pyproject\.toml|dockerfile[^/]*|vercel\.json)$/i.test(path)).slice(0, 30);
+    const testPaths = blobPaths.filter((path) => /(^|\/)(tests?|__tests__|specs?)(\/|\.)|\.(test|spec)\.[jt]sx?$/i.test(path)).slice(0, 30);
+    const sourcePaths = blobPaths.filter((path) => /(^|\/)(src|lib|server|app|pages|api|routes?|components?)(\/|$)/i.test(path)).slice(0, 60);
+    const notablePaths = [...new Set([...configPaths, ...testPaths, ...sourcePaths])].slice(0, 120);
+
+    const repoData = {
+      owner,
+      name: metadata.name,
+      fullName: metadata.full_name,
+      description: metadata.description,
+      stars: metadata.stargazers_count,
+      forks: metadata.forks_count,
+      language: metadata.language,
+      defaultBranch: metadata.default_branch,
+      url: metadata.html_url,
+    };
+    const fileTreeSummary = { totalFiles: blobs.length, selectedFiles: files.length, topExtensions, notablePaths };
+    const analysis = extractSkills({ repo: repoData, readmeSummaryInput: readme, files, fileTreeSummary });
+
     const response: AnalyzeSuccessResponse = {
       success: true,
-      repo: {
-        owner,
-        name: metadata.name,
-        fullName: metadata.full_name,
-        description: metadata.description,
-        stars: metadata.stargazers_count,
-        forks: metadata.forks_count,
-        language: metadata.language,
-        defaultBranch: metadata.default_branch,
-        url: metadata.html_url,
-      },
+      repo: repoData,
       readmeSummaryInput: readme,
       files,
-      fileTreeSummary: { totalFiles: blobs.length, selectedFiles: files.length, topExtensions },
+      fileTreeSummary,
       targetJob,
+      analysis,
     };
 
     return NextResponse.json(response);
