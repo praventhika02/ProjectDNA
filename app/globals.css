@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {
@@ -16,14 +16,30 @@ html {
 
 body {
   margin: 0;
-  background: #05050a;
-  color: #f8fafc;
+  background:
+    radial-gradient(circle at 16% 12%, rgba(8, 145, 178, 0.12), transparent 24rem),
+    radial-gradient(circle at 86% 18%, rgba(79, 70, 229, 0.10), transparent 24rem),
+    radial-gradient(circle at 50% 95%, rgba(15, 118, 110, 0.10), transparent 28rem),
+    linear-gradient(135deg, #eef4ff 0%, #f4f7fb 48%, #edf7f6 100%);
+  color: #0f172a;
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+
 ::selection {
-  background: rgba(139, 92, 246, 0.45);
-  color: white;
+  background: rgba(79, 70, 229, 0.18);
+  color: #0f172a;
 }
 
 @keyframes shimmer {

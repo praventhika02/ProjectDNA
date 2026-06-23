@@ -22,18 +22,32 @@ async function copyText(text: string): Promise<void> {
   if (!copied) throw new Error("Clipboard copy failed");
 }
 
-function Section({ eyebrow, title, children }: { eyebrow: string; title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-slate-800 bg-[#0b1220] p-5 sm:p-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-300">{eyebrow}</p>
-      <h2 className="mt-2 text-xl font-semibold tracking-tight text-white">{title}</h2>
+    <section className="rounded-2xl border border-slate-300 bg-[#F7F8FA] p-5 shadow-sm">
+      <h2 className="text-lg font-semibold text-slate-950">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
   );
 }
 
-function EvidenceList({ items, empty }: { items: string[]; empty: string }) {
-  return items.length ? <div className="space-y-2">{items.map((item) => <div key={item} className="flex gap-3 text-sm leading-6 text-slate-400"><span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-blue-400" />{item}</div>)}</div> : <p className="text-sm text-slate-600">{empty}</p>;
+function List({ items, empty }: { items: string[]; empty: string }) {
+  if (!items.length) return <p className="text-sm text-slate-500">{empty}</p>;
+  return (
+    <div className="space-y-2">
+      {items.map((item) => <p key={item} className="flex gap-2 text-sm leading-6 text-slate-600"><span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-600" />{item}</p>)}
+    </div>
+  );
+}
+
+function Stat({ label, value, detail }: { label: string; value: string | number; detail?: string }) {
+  return (
+    <div className="rounded-xl border border-slate-300 bg-gradient-to-br from-[#EEF4FF] to-[#EAF3F8] p-4 shadow-sm">
+      <p className="text-xs font-medium text-slate-500">{label}</p>
+      <p className="mt-1 text-xl font-semibold text-slate-950">{value}</p>
+      {detail && <p className="mt-1 text-xs text-slate-500">{detail}</p>}
+    </div>
+  );
 }
 
 export default function LatestReportPage() {
@@ -44,12 +58,7 @@ export default function LatestReportPage() {
   useEffect(() => {
     try {
       const stored = localStorage.getItem(REPORT_STORAGE_KEY);
-      if (!stored) {
-        setReport(null);
-        return;
-      }
-      const parsed = JSON.parse(stored) as AnalyzeSuccessResponse;
-      setReport(parsed?.success === true && parsed.evidencePacket ? parsed : null);
+      setReport(stored ? JSON.parse(stored) as AnalyzeSuccessResponse : null);
     } catch {
       setReport(null);
     }
@@ -69,17 +78,16 @@ export default function LatestReportPage() {
   }
 
   if (report === undefined) {
-    return <main className="flex min-h-screen items-center justify-center bg-[#050814] text-sm text-slate-500">Loading evidence packet...</main>;
+    return <main className="flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,#EEF4FF,#F4F7FB,#EDF7F6)] text-sm text-slate-500">Loading report...</main>;
   }
 
-  if (!report) {
+  if (!report?.success) {
     return (
-      <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#050814] px-6 text-center text-white">
-        <div className="relative max-w-lg rounded-2xl border border-slate-800 bg-[#0b1220] p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">ProjectDNA Evidence Packet</p>
-          <h1 className="mt-5 text-3xl font-semibold">No report found.</h1>
-          <p className="mt-4 text-sm leading-6 text-slate-400">Run an analysis first, then choose View Evidence Report to save it in this browser.</p>
-          <Link href="/" className="mt-7 inline-flex rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-blue-100">Run analysis</Link>
+      <main className="flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,#EEF4FF,#F4F7FB,#EDF7F6)] px-6 text-center">
+        <div className="max-w-md rounded-2xl border border-slate-300 bg-[#EAF3F8] p-8 shadow-sm">
+          <h1 className="text-2xl font-semibold text-slate-950">No report found</h1>
+          <p className="mt-3 text-sm leading-6 text-slate-600">Run an analysis first, then open the formal report from the workspace.</p>
+          <Link href="/" className="mt-6 inline-flex rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Run analysis</Link>
         </div>
       </main>
     );
@@ -89,61 +97,82 @@ export default function LatestReportPage() {
   const target = opportunity.targetMatch;
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#050814] text-slate-100">
-
-      <header className="relative z-10 border-b border-slate-800 bg-[#050814]/90">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-5">
-          <Link href="/" className="text-sm font-semibold tracking-wide text-white">ProjectDNA</Link>
-          <div className="flex items-center gap-2"><Link href="/analysis" className="rounded-xl border border-slate-800 px-4 py-2 text-xs text-slate-300 transition hover:bg-slate-900">Workspace</Link><button type="button" onClick={copySummary} className="rounded-xl bg-white px-4 py-2 text-xs font-semibold text-slate-950 transition hover:bg-blue-100">{copied ? "Summary copied" : "Copy Summary"}</button></div>
+    <main className="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#EEF4FF_0%,#F4F7FB_52%,#EDF7F6_100%)] text-slate-900">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:36px_36px]" />
+      </div>
+      <header className="relative z-10 border-b border-slate-300 bg-[#EAF3F8]/85 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
+          <Link href="/" className="text-sm font-semibold text-indigo-700">ProjectDNA</Link>
+          <div className="flex items-center gap-2">
+            <Link href="/analysis" className="rounded-xl border border-slate-300 bg-[#EEF4FF] px-3 py-2 text-xs font-medium text-slate-700 shadow-sm hover:bg-[#EAF3F8]">Workspace</Link>
+            <button type="button" onClick={copySummary} className="rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700">{copied ? "Copied" : "Copy Summary"}</button>
+          </div>
         </div>
       </header>
 
-      <div className="relative z-10 mx-auto max-w-5xl px-6 pb-20 pt-12">
-        <div className="max-w-4xl">
-          <div className="flex flex-wrap items-center gap-3"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">ProjectDNA Evidence Packet</p><span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${report.analysisMode === "demo" ? "border-blue-400/20 bg-blue-500/10 text-blue-300" : "border-emerald-400/20 bg-emerald-500/10 text-emerald-300"}`}>{report.analysisMode === "demo" ? "Demo snapshot" : "Live GitHub analysis"}</span></div>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">{evidencePacket.headline}</h1>
-          <p className="mt-5 max-w-3xl text-sm leading-6 text-slate-400">{evidencePacket.summary}</p>
+      <div className="relative z-10 mx-auto max-w-6xl px-6 py-8">
+        <div className="rounded-[1.75rem] border border-slate-300 bg-gradient-to-r from-[#EEF4FF] via-[#EAF3F8] to-[#EDF7F6] p-6 shadow-xl shadow-slate-200/60">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div>
+              <p className="font-mono text-xs font-semibold uppercase tracking-wide text-cyan-700">Evidence Packet</p>
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{evidencePacket.headline}</h1>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">{evidencePacket.summary}</p>
+            </div>
+            <span className={`w-fit rounded-full border px-3 py-1 text-xs font-medium ${report.analysisMode === "demo" ? "border-indigo-300 bg-[#F2F0FF] text-indigo-700" : "border-teal-300 bg-[#EDF7F6] text-teal-700"}`}>{report.analysisMode === "demo" ? "Demo snapshot" : "Live GitHub analysis"}</span>
+          </div>
         </div>
 
-        {analysis.confidence < 40 && <div className="mt-8 rounded-xl border border-amber-400/25 bg-amber-400/[0.07] px-5 py-4 text-sm text-amber-200">Low evidence confidence - this repo may not contain enough public work to assess readiness.</div>}
-        {copyError && <div role="alert" className="mt-4 text-sm text-rose-400">{copyError}</div>}
+        {analysis.confidence < 40 && <div className="mt-4 rounded-xl border border-amber-300 bg-[#FFF7E8] px-4 py-3 text-sm text-amber-800">Low confidence: this repo may not contain enough public evidence for a strong assessment.</div>}
+        {copyError && <div role="alert" className="mt-4 text-sm text-red-700">{copyError}</div>}
 
-        <section className="mt-8 overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/60">
-          <div className="grid gap-px bg-slate-800 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="bg-[#0b0b12] p-6"><p className="text-xs text-slate-500">Repository</p><a href={repo.url} target="_blank" rel="noreferrer" className="mt-2 block truncate text-lg font-semibold text-white hover:text-violet-200">{repo.fullName}</a><p className="mt-1 text-xs text-slate-600">{repo.language ?? "Mixed language"} / {repo.stars.toLocaleString()} stars</p></div>
-            <div className="bg-[#0b0b12] p-6"><p className="text-xs text-slate-500">Public files</p><p className="mt-2 text-2xl font-semibold text-white">{fileTreeSummary.totalFiles}</p><p className="mt-1 text-xs text-slate-600">{fileTreeSummary.selectedFiles} evidence files inspected</p></div>
-            <div className="bg-[#0b0b12] p-6"><p className="text-xs text-slate-500">Target opportunity</p><p className="mt-2 text-lg font-semibold text-white">{targetJob.title}</p><p className="mt-1 text-xs text-slate-600">{targetJob.company}</p></div>
-            <div className="bg-[#0b0b12] p-6"><p className="text-xs text-slate-500">Opportunity match</p><p className="mt-2 text-3xl font-semibold text-violet-300">{target.matchScore}%</p><p className="mt-1 text-xs capitalize text-slate-500">{target.readinessLevel} readiness / {target.evidenceStrength}% evidence strength</p></div>
-          </div>
-        </section>
+        <div className="mt-5 grid gap-4 md:grid-cols-4">
+          <Stat label="Repository" value={repo.fullName} detail={repo.language ?? "Mixed language"} />
+          <Stat label="Target role" value={targetJob.title} detail={targetJob.company} />
+          <Stat label="Match score" value={`${target.matchScore}%`} detail={`${target.readinessLevel} readiness`} />
+          <Stat label="Files reviewed" value={fileTreeSummary.selectedFiles} detail={`${fileTreeSummary.totalFiles} total files`} />
+        </div>
 
         <div className="mt-5 grid gap-5">
-          <Section eyebrow="Recruiter Summary" title="Evidence-led introduction"><blockquote className="border-l-2 border-blue-400 pl-5 text-base font-medium leading-7 text-slate-200">&ldquo;{evidencePacket.recruiterPitch}&rdquo;</blockquote></Section>
-
-          <Section eyebrow="Skill Evidence" title="What the public repository supports">
-            {analysis.detectedSkills.length ? <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{analysis.detectedSkills.slice(0, 5).map((skill) => <div key={skill.skill} className="rounded-2xl border border-white/[0.08] bg-black/20 p-4"><div className="flex items-center justify-between gap-2"><p className="font-medium text-white">{skill.skill}</p><span className="text-xs text-cyan-300">{skill.confidence}%</span></div><div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style={{ width: `${skill.confidence}%` }} /></div><p className="mt-3 text-xs leading-5 text-slate-500">{skill.evidence[0]}</p></div>)}</div> : <p className="text-sm text-slate-500">No defensible skill evidence was found in the available public material.</p>}
+          <Section title="Recruiter Summary">
+            <div className="rounded-2xl border border-slate-300 bg-[#EAF3F8] p-4"><blockquote className="border-l-2 border-cyan-600 pl-4 text-sm leading-6 text-slate-700">{evidencePacket.recruiterPitch}</blockquote></div>
           </Section>
 
-          <Section eyebrow="Opportunity Fit" title={`${target.title} / ${target.matchScore}% match`}>
-            <p className="mb-6 text-sm leading-6 text-slate-400">{evidencePacket.opportunityFit}</p>
-            {target.matchedSkills.length ? <div className="grid gap-3 md:grid-cols-2">{target.matchedSkills.map((match) => <div key={`${match.jobSkill}-${match.matchedRepoSkill}`} className="rounded-xl border border-white/[0.08] bg-white/[0.025] p-4"><div className="flex justify-between gap-3"><p className="text-sm text-white">{match.jobSkill} <span className="text-slate-600">via</span> <span className="text-cyan-300">{match.matchedRepoSkill}</span></p><span className="text-xs text-slate-500">{match.strength}%</span></div><p className="mt-2 text-xs leading-5 text-slate-500">{match.evidence[0]}</p></div>)}</div> : <p className="text-sm text-slate-600">No target requirements have supporting repository evidence yet.</p>}
+          <Section title="Skill Evidence">
+            {analysis.detectedSkills.length ? <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">{analysis.detectedSkills.slice(0, 5).map((skill) => <div key={skill.skill} className="rounded-xl border border-slate-300 bg-[#EEF4FF] p-3"><div className="flex items-center justify-between gap-2"><p className="text-sm font-medium text-slate-950">{skill.skill}</p><span className="font-mono text-xs text-indigo-700">{skill.confidence}%</span></div><p className="mt-2 text-xs leading-5 text-slate-600">{skill.evidence[0]}</p></div>)}</div> : <p className="text-sm text-slate-500">No defensible skill evidence was found.</p>}
           </Section>
 
-          <Section eyebrow="Gap Narrative" title="What the current evidence does not yet show">
-            <p className="text-sm leading-6 text-slate-400">{evidencePacket.gapNarrative}</p>
-            <div className="mt-6 grid gap-6 md:grid-cols-2"><div><h3 className="text-sm font-semibold text-rose-300">Critical gaps</h3><div className="mt-3"><EvidenceList items={opportunity.gapAnalysis.criticalGaps} empty="No critical required gaps detected." /></div></div><div><h3 className="text-sm font-semibold text-amber-300">Improvement areas</h3><div className="mt-3"><EvidenceList items={opportunity.gapAnalysis.improvementAreas} empty="No immediate quality improvements identified." /></div></div></div>
+          <Section title="Opportunity Fit">
+            {target.matchedSkills.length ? <div className="grid gap-3 md:grid-cols-2">{target.matchedSkills.map((match) => <div key={`${match.jobSkill}-${match.matchedRepoSkill}`} className="rounded-xl border border-slate-300 bg-[#EAF3F8] p-3 shadow-sm"><div className="flex justify-between gap-3"><p className="text-sm text-slate-900">{match.jobSkill} <span className="text-slate-500">via</span> <span className="font-medium text-indigo-700">{match.matchedRepoSkill}</span></p><span className="font-mono text-xs text-slate-500">{match.strength}%</span></div><p className="mt-2 text-xs leading-5 text-slate-600">{match.evidence[0]}</p></div>)}</div> : <p className="text-sm text-slate-500">No target requirements have supporting repository evidence yet.</p>}
           </Section>
 
-          <Section eyebrow="Recommended Next Build" title={portfolioProject.title}>
-            <p className="text-sm leading-6 text-slate-400">{portfolioProject.whyThisProject}</p>
-            <div className="mt-6 grid gap-7 md:grid-cols-2"><div><h3 className="text-sm font-semibold text-violet-300">Skills to prove</h3><div className="mt-3 flex flex-wrap gap-2">{portfolioProject.skillsToProve.map((skill) => <span key={skill} className="rounded-full border border-violet-400/20 bg-violet-400/[0.07] px-3 py-1.5 text-xs text-violet-200">{skill}</span>)}</div></div><div><h3 className="text-sm font-semibold text-emerald-300">Success criteria</h3><div className="mt-3"><EvidenceList items={portfolioProject.successCriteria} empty="No criteria generated." /></div></div></div>
-            <div className="mt-7 rounded-xl border border-fuchsia-400/15 bg-fuchsia-400/[0.04] p-4 text-sm leading-6 text-fuchsia-100">{portfolioProject.portfolioPitch}</div>
+          <Section title="Gaps and Improvements">
+            <div className="grid gap-5 md:grid-cols-2">
+              <div><h3 className="text-sm font-semibold text-slate-950">Critical gaps</h3><div className="mt-3"><List items={opportunity.gapAnalysis.criticalGaps} empty="No critical gaps detected." /></div></div>
+              <div><h3 className="text-sm font-semibold text-slate-950">Improvement areas</h3><div className="mt-3"><List items={opportunity.gapAnalysis.improvementAreas} empty="No immediate improvements identified." /></div></div>
+            </div>
           </Section>
 
-          <Section eyebrow="Credibility Notes" title="How to interpret this packet"><EvidenceList items={evidencePacket.credibilityNotes} empty="No credibility notes available." /></Section>
+          <Section title="Recommended Next Build">
+            <p className="text-sm leading-6 text-slate-600">{portfolioProject.whyThisProject}</p>
+            <div className="mt-4 grid gap-5 md:grid-cols-2">
+              <div><h3 className="text-sm font-semibold text-slate-950">Skills to prove</h3><div className="mt-3 flex flex-wrap gap-2">{portfolioProject.skillsToProve.map((skill) => <span key={skill} className="rounded-full border border-slate-300 bg-[#EEF4FF] px-3 py-1 text-xs text-indigo-700">{skill}</span>)}</div></div>
+              <div><h3 className="text-sm font-semibold text-slate-950">Success criteria</h3><div className="mt-3"><List items={portfolioProject.successCriteria} empty="No criteria generated." /></div></div>
+            </div>
+          </Section>
+
+          <Section title="Credibility Notes">
+            <List items={evidencePacket.credibilityNotes} empty="No credibility notes available." />
+          </Section>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-8"><p className="text-xs text-slate-600">Stored locally in this browser. Refreshing this page keeps the latest saved report.</p><div className="flex gap-2"><Link href="/analysis" className="rounded-xl border border-white/10 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5">Interactive Workspace</Link><button type="button" onClick={copySummary} className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 hover:bg-cyan-100">{copied ? "Summary copied" : "Copy Summary"}</button></div></div>
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-300 pt-5">
+          <p className="text-xs text-slate-500">Stored locally in this browser.</p>
+          <div className="flex gap-2">
+            <Link href="/analysis" className="rounded-xl border border-slate-300 bg-[#EEF4FF] px-4 py-2 text-sm text-slate-700 hover:bg-[#EAF3F8]">Workspace</Link>
+            <button type="button" onClick={copySummary} className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">{copied ? "Copied" : "Copy Summary"}</button>
+          </div>
+        </div>
       </div>
     </main>
   );
