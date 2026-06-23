@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ProductNav, type ProductStepId } from "@/components/ProductNav";
+import { calculateOpportunityGap, generateRecruiterView, simulateOpportunityGrowth } from "@/lib/opportunity-simulator";
 import type { AnalyzeSuccessResponse, SkillCategory, SkillEvidence } from "@/types/project-dna";
 
 const REPORT_STORAGE_KEY = "projectdna_latest_report";
@@ -227,12 +228,46 @@ function ChecklistGroup({ title, items, checked, onToggle, tone }: { title: stri
   );
 }
 
+function SimulatorStep({ action, scoreGain, category }: { action: string; scoreGain: number; category: string }) {
+  const tone = category === "portfolio_project" ? "text-fuchsia-300" : category === "quality" ? "text-cyan-300" : "text-emerald-300";
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/20 p-4 transition hover:border-cyan-400/25 hover:bg-white/[0.04]">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${tone}`}>{category.replace("_", " ")}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-300">{action}</p>
+        </div>
+        <span className="shrink-0 rounded-full border border-emerald-400/20 bg-emerald-400/[0.08] px-3 py-1.5 text-sm font-semibold text-emerald-200">+{scoreGain}</span>
+      </div>
+    </div>
+  );
+}
+
+function GaugeMeter({ value, label }: { value: number; label: string }) {
+  const rotation = Math.max(-90, Math.min(90, -90 + value * 1.8));
+  return (
+    <div className="rounded-3xl border border-white/10 bg-white/[0.025] p-6">
+      <div className="relative mx-auto h-36 max-w-xs overflow-hidden">
+        <div className="absolute inset-x-0 bottom-0 h-72 rounded-full border-[18px] border-white/10" />
+        <div className="absolute inset-x-0 bottom-0 h-72 rounded-full border-[18px] border-transparent border-l-amber-400 border-r-cyan-400 border-t-emerald-400" />
+        <div className="absolute bottom-0 left-1/2 h-28 w-1 origin-bottom rounded-full bg-white shadow-[0_0_22px_rgba(255,255,255,0.5)] transition-transform duration-700" style={{ transform: `translateX(-50%) rotate(${rotation}deg)` }} />
+        <div className="absolute bottom-0 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-white" />
+      </div>
+      <div className="mt-4 text-center">
+        <p className="text-4xl font-semibold text-white">{value}</p>
+        <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">{label}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function AnalysisPage() {
   const [report, setReport] = useState<AnalyzeSuccessResponse | null | undefined>(undefined);
   const [activeStep, setActiveStep] = useState<ProductStepId>("overview");
   const [skillFilter, setSkillFilter] = useState<"all" | SkillCategory>("all");
   const [expandedSkill, setExpandedSkill] = useState<string | null>(null);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  const [recruiterMode, setRecruiterMode] = useState<"student" | "recruiter">("student");
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState("");
 
@@ -294,6 +329,27 @@ export default function AnalysisPage() {
   const filteredSkills = skillFilter === "all" ? analysis.detectedSkills : analysis.detectedSkills.filter((skill) => skill.category === skillFilter || (skillFilter === "frontend" && skill.category === "framework"));
   const checkedCount = checklistItems.filter((item) => checkedItems.has(item)).length;
   const progress = checklistItems.length ? Math.round((checkedCount / checklistItems.length) * 100) : 0;
+  const simulator = simulateOpportunityGrowth({
+    currentMatch: target,
+    missingRequiredSkills: target.missingRequiredSkills,
+    missingPreferredSkills: target.missingPreferredSkills,
+    qualitySignals: analysis.qualitySignals,
+    portfolioProject,
+  });
+  const overlookedMeter = calculateOpportunityGap({
+    detectedSkills: analysis.detectedSkills,
+    currentMatch: target,
+    qualitySignals: analysis.qualitySignals,
+    projectComplexity: analysis.projectComplexity,
+  });
+  const recruiterView = generateRecruiterView({
+    analysis,
+    targetMatch: target,
+    gapAnalysis: opportunity.gapAnalysis,
+    portfolioProject,
+    targetJob,
+  });
+  const unlockable = simulator.projectedScore - simulator.currentScore;
 
   return (
     <Shell>
@@ -310,7 +366,7 @@ export default function AnalysisPage() {
       <div className="relative z-10 mx-auto max-w-7xl px-6 pb-24 pt-10 lg:px-8">
         <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">GitHub → Skill DNA → Opportunity Fit → Build Plan → Evidence Packet</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">GitHub -&gt; Skill DNA -&gt; Opportunity Fit -&gt; Opportunity Lab -&gt; Evidence Packet</p>
             <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.035em] text-white sm:text-6xl">Interactive ProjectDNA workspace</h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400">Move through the evidence journey one step at a time. Nothing here is inferred from social proof; it is based on public repository signals and seeded role requirements.</p>
           </div>
@@ -449,6 +505,96 @@ export default function AnalysisPage() {
                   <div><h3 className="text-sm font-semibold text-amber-300">Stretch goals</h3><div className="mt-3"><EvidenceList items={portfolioProject.stretchGoals} empty="No stretch goals generated." tone="amber" /></div></div>
                 </div>
                 <blockquote className="relative mt-8 rounded-2xl border border-white/10 bg-black/25 p-5 text-lg font-medium leading-8 text-white">&ldquo;{portfolioProject.portfolioPitch}&rdquo;</blockquote>
+              </div>
+            </section>
+          )}
+
+          {activeStep === "lab" && (
+            <section>
+              <SectionHeader eyebrow="Opportunity Lab" title="Simulate the next opportunity unlock" text="This lab turns the current ProjectDNA analysis into a forward-looking simulator: what improves, what remains hidden, and how a recruiter might read the evidence." />
+              <div className="mb-6 grid gap-4 md:grid-cols-3">
+                <MetricCard label="Current Match" value={`${simulator.currentScore}%`} detail={target.readinessLevel} />
+                <MetricCard label="Potential Match" value={`${simulator.projectedScore}%`} detail={simulator.projectedScore >= 75 ? "Strong Potential" : "Evidence still developing"} />
+                <MetricCard label="Opportunity Gap" value={`${overlookedMeter.opportunityGap > 0 ? "+" : ""}${overlookedMeter.opportunityGap}`} detail={overlookedMeter.classification} />
+              </div>
+
+              <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+                <div className="overflow-hidden rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-[#0c1118] to-[#0c0a14]">
+                  <div className="border-b border-white/10 p-6 sm:p-8">
+                    <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">Opportunity Simulator</p>
+                        <h3 className="mt-3 text-2xl font-semibold text-white">Current to potential readiness</h3>
+                        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">Projected gains come from missing skills, weak evidence signals, and the recommended portfolio project. Scores are capped at 95.</p>
+                      </div>
+                      <Badge tone={simulator.projectedScore >= 75 ? "emerald" : simulator.projectedScore >= 55 ? "cyan" : "amber"}>{simulator.projectedScore >= 75 ? "Strong Potential" : "Growth Path"}</Badge>
+                    </div>
+                    <div className="mt-7 grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+                      <div className="rounded-2xl border border-white/10 bg-black/25 p-5">
+                        <p className="text-xs text-slate-500">Current</p>
+                        <p className="mt-2 text-5xl font-semibold text-white">{simulator.currentScore}%</p>
+                        <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/[0.08]"><div className="h-full rounded-full bg-violet-500 transition-all duration-700" style={{ width: `${simulator.currentScore}%` }} /></div>
+                      </div>
+                      <div className="hidden text-cyan-300 sm:block"><ArrowIcon /></div>
+                      <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.045] p-5">
+                        <p className="text-xs text-slate-500">Potential</p>
+                        <p className="mt-2 text-5xl font-semibold text-white">{simulator.projectedScore}%</p>
+                        <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/[0.08]"><div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-700" style={{ width: `${simulator.projectedScore}%` }} /></div>
+                      </div>
+                    </div>
+                    <div className="mt-5 rounded-xl border border-emerald-400/15 bg-emerald-400/[0.04] px-4 py-3 text-sm text-emerald-100">Unlockable opportunity: <span className="font-semibold">+{unlockable}%</span></div>
+                  </div>
+                  <div className="grid gap-3 p-6 sm:p-8">
+                    {simulator.improvements.map((improvement) => <SimulatorStep key={`${improvement.category}-${improvement.action}`} action={improvement.action} scoreGain={improvement.scoreGain} category={improvement.category} />)}
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="rounded-3xl border border-violet-400/20 bg-violet-400/[0.035] p-6 sm:p-8">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">Talent Overlooked Meter</p>
+                        <h3 className="mt-3 text-2xl font-semibold text-white">{overlookedMeter.classification}</h3>
+                      </div>
+                      <Badge tone={overlookedMeter.classification === "Highly Overlooked" ? "rose" : overlookedMeter.classification === "Undervalued" ? "amber" : overlookedMeter.classification === "Well Represented" ? "cyan" : "emerald"}>{overlookedMeter.classification}</Badge>
+                    </div>
+                    <div className="mt-6"><GaugeMeter value={Math.max(0, Math.min(100, overlookedMeter.opportunityGap + 50))} label="Visibility gap" /></div>
+                    <p className="mt-5 text-sm leading-6 text-slate-400">{overlookedMeter.explanation}</p>
+                    <div className="mt-5 grid grid-cols-2 gap-3">
+                      <div className="rounded-2xl border border-white/10 bg-black/20 p-4"><p className="text-xs text-slate-500">Capability</p><p className="mt-2 text-2xl font-semibold text-white">{overlookedMeter.capabilityScore}</p></div>
+                      <div className="rounded-2xl border border-white/10 bg-black/20 p-4"><p className="text-xs text-slate-500">Visibility</p><p className="mt-2 text-2xl font-semibold text-white">{overlookedMeter.visibilityScore}</p></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-3xl border border-white/10 bg-white/[0.025] p-6 sm:p-8">
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-fuchsia-300">Recruiter Mode</p>
+                    <h3 className="mt-3 text-2xl font-semibold text-white">Switch perspective</h3>
+                  </div>
+                  <div className="flex rounded-xl border border-white/10 bg-black/25 p-1">
+                    <button type="button" onClick={() => setRecruiterMode("student")} className={`rounded-lg px-4 py-2 text-xs font-semibold transition ${recruiterMode === "student" ? "bg-white text-slate-950" : "text-slate-400 hover:text-white"}`}>Student View</button>
+                    <button type="button" onClick={() => setRecruiterMode("recruiter")} className={`rounded-lg px-4 py-2 text-xs font-semibold transition ${recruiterMode === "recruiter" ? "bg-white text-slate-950" : "text-slate-400 hover:text-white"}`}>Recruiter View</button>
+                  </div>
+                </div>
+
+                {recruiterMode === "student" ? (
+                  <div className="mt-7 grid gap-5 lg:grid-cols-4">
+                    <div className="rounded-2xl border border-white/10 bg-black/20 p-5"><h4 className="text-sm font-semibold text-cyan-300">Skills</h4><div className="mt-3 flex flex-wrap gap-2">{analysis.detectedSkills.slice(0, 6).map((skill) => <Badge key={skill.skill} tone="cyan">{skill.skill}</Badge>)}</div></div>
+                    <div className="rounded-2xl border border-white/10 bg-black/20 p-5"><h4 className="text-sm font-semibold text-rose-300">Gaps</h4><div className="mt-3"><EvidenceList items={target.missingRequiredSkills.slice(0, 4)} empty="No required gaps detected." tone="rose" /></div></div>
+                    <div className="rounded-2xl border border-white/10 bg-black/20 p-5"><h4 className="text-sm font-semibold text-fuchsia-300">Project</h4><p className="mt-3 text-sm leading-6 text-slate-300">{portfolioProject.title}</p></div>
+                    <div className="rounded-2xl border border-white/10 bg-black/20 p-5"><h4 className="text-sm font-semibold text-emerald-300">Path</h4><p className="mt-3 text-sm leading-6 text-slate-300">Close the top gaps, publish the build plan, then use the evidence packet as your recruiter-facing story.</p></div>
+                  </div>
+                ) : (
+                  <div className="mt-7 grid gap-6 lg:grid-cols-[1fr_1fr]">
+                    <div className="rounded-2xl border border-white/10 bg-black/20 p-5"><h4 className="text-sm font-semibold text-white">Capability Summary</h4><p className="mt-3 text-sm leading-6 text-slate-300">{recruiterView.capabilitySummary}</p><div className="mt-5 rounded-xl border border-cyan-400/15 bg-cyan-400/[0.04] p-4 text-sm leading-6 text-cyan-100">{recruiterView.hiringRecommendation}</div></div>
+                    <div className="rounded-2xl border border-white/10 bg-black/20 p-5"><h4 className="text-sm font-semibold text-emerald-300">Top Evidence</h4><div className="mt-3"><EvidenceList items={recruiterView.strongestEvidence} empty="No strong evidence available." tone="emerald" /></div></div>
+                    <div className="rounded-2xl border border-white/10 bg-black/20 p-5"><h4 className="text-sm font-semibold text-violet-300">Interview Focus Areas</h4><div className="mt-3"><EvidenceList items={recruiterView.interviewTopics} empty="No interview topics generated." /></div></div>
+                    <div className="rounded-2xl border border-white/10 bg-black/20 p-5"><h4 className="text-sm font-semibold text-amber-300">Risk Areas</h4><div className="mt-3"><EvidenceList items={recruiterView.riskAreas} empty="No major risk areas identified." tone="amber" /></div></div>
+                  </div>
+                )}
               </div>
             </section>
           )}

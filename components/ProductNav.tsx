@@ -1,6 +1,6 @@
 "use client";
 
-export type ProductStepId = "overview" | "skills" | "fit" | "gaps" | "build" | "packet";
+export type ProductStepId = "overview" | "skills" | "fit" | "gaps" | "build" | "lab" | "packet";
 
 export interface ProductStep {
   id: ProductStepId;
@@ -14,6 +14,7 @@ export const productSteps: ProductStep[] = [
   { id: "fit", label: "Fit Score", shortLabel: "Fit Score" },
   { id: "gaps", label: "Gap Map", shortLabel: "Gap Map" },
   { id: "build", label: "Build Plan", shortLabel: "Build Plan" },
+  { id: "lab", label: "Opportunity Lab", shortLabel: "Lab" },
   { id: "packet", label: "Packet", shortLabel: "Packet" },
 ];
 
@@ -25,7 +26,7 @@ interface ProductNavProps {
 export function ProductNav({ activeStep, onStepChange }: ProductNavProps) {
   return (
     <nav className="sticky top-3 z-20 rounded-2xl border border-white/10 bg-[#080812]/90 p-2 shadow-2xl shadow-black/30 backdrop-blur-xl" aria-label="ProjectDNA analysis steps">
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-7">
         {productSteps.map((step, index) => {
           const isActive = step.id === activeStep;
           return (

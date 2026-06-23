@@ -134,6 +134,34 @@ export interface EvidencePacket {
   credibilityNotes: string[];
 }
 
+export interface OpportunityImprovement {
+  action: string;
+  scoreGain: number;
+  category: "required_skill" | "preferred_skill" | "quality" | "portfolio_project";
+}
+
+export interface OpportunitySimulation {
+  currentScore: number;
+  projectedScore: number;
+  improvements: OpportunityImprovement[];
+}
+
+export interface TalentOverlookedMeter {
+  capabilityScore: number;
+  visibilityScore: number;
+  opportunityGap: number;
+  classification: "Highly Overlooked" | "Undervalued" | "Well Represented" | "Highly Visible";
+  explanation: string;
+}
+
+export interface RecruiterView {
+  capabilitySummary: string;
+  strongestEvidence: string[];
+  interviewTopics: string[];
+  riskAreas: string[];
+  hiringRecommendation: string;
+}
+
 export interface AnalyzeSuccessResponse {
   success: true;
   analysisMode: "live" | "demo";
