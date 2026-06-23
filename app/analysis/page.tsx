@@ -171,6 +171,7 @@ function SkillCard({ skill, expanded, onToggle }: { skill: SkillEvidence; expand
           </div>
           <span className="text-xs font-medium text-slate-300">{skill.proficiency}/5</span>
         </div>
+        <p className="mt-3 text-xs text-slate-500">{skill.sourceFiles.length} source file{skill.sourceFiles.length === 1 ? "" : "s"} linked</p>
       </button>
       <div className="mt-4 space-y-2">
         {skill.evidence.slice(0, expanded ? undefined : 1).map((line) => <p key={line} className="flex gap-2 text-xs leading-5 text-slate-400"><span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-cyan-400" />{line}</p>)}
@@ -202,6 +203,53 @@ function ScoreRow({ label, value, weight }: { label: string; value: number; weig
   );
 }
 
+function RadialScore({ score, label }: { score: number; label: string }) {
+  return (
+    <div className="relative mx-auto flex h-56 w-56 items-center justify-center rounded-full" style={{ background: `conic-gradient(rgb(34 211 238) ${score * 3.6}deg, rgba(255,255,255,0.08) 0deg)` }}>
+      <div className="absolute inset-3 rounded-full bg-[#090914]" />
+      <div className="relative text-center">
+        <p className="text-6xl font-semibold tracking-tight text-white">{score}<span className="text-2xl text-slate-500">%</span></p>
+        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">{label}</p>
+      </div>
+    </div>
+  );
+}
+
+function SkillDnaMap({ skills }: { skills: SkillEvidence[] }) {
+  const topSkills = skills.slice(0, 14);
+  if (!topSkills.length) {
+    return <div className="rounded-3xl border border-dashed border-white/10 p-8 text-center text-sm text-slate-500">No skill clusters can be drawn until public evidence is available.</div>;
+  }
+  return (
+    <div className="overflow-hidden rounded-3xl border border-cyan-400/15 bg-gradient-to-br from-cyan-400/[0.05] to-violet-500/[0.04] p-6">
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">Skill DNA Map</p>
+          <p className="mt-2 text-sm text-slate-500">Cluster size reflects confidence. Color reflects skill category.</p>
+        </div>
+      </div>
+      <div className="flex min-h-72 flex-wrap items-center justify-center gap-4 rounded-3xl border border-white/10 bg-black/20 p-6">
+        {topSkills.map((skill, index) => {
+          const size = 72 + Math.round(skill.confidence / 5);
+          const tone = skill.category === "backend" ? "from-cyan-400/25 to-blue-500/10 border-cyan-300/25"
+            : skill.category === "frontend" || skill.category === "framework" ? "from-violet-400/25 to-fuchsia-500/10 border-violet-300/25"
+              : skill.category === "testing" ? "from-emerald-400/25 to-cyan-500/10 border-emerald-300/25"
+                : skill.category === "devops" ? "from-amber-400/25 to-orange-500/10 border-amber-300/25"
+                  : "from-slate-300/15 to-white/5 border-white/15";
+          return (
+            <div key={`${skill.skill}-${index}`} className={`flex shrink-0 items-center justify-center rounded-full border bg-gradient-to-br p-3 text-center shadow-[0_0_32px_rgba(34,211,238,0.08)] transition hover:-translate-y-1 ${tone}`} style={{ width: size, height: size }}>
+              <div>
+                <p className="text-xs font-semibold text-white">{skill.skill}</p>
+                <p className="mt-1 text-[10px] text-slate-400">{skill.confidence}%</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function EvidenceList({ items, empty, tone = "cyan" }: { items: string[]; empty: string; tone?: "cyan" | "rose" | "amber" | "emerald" }) {
   const color = tone === "rose" ? "bg-rose-400" : tone === "amber" ? "bg-amber-400" : tone === "emerald" ? "bg-emerald-400" : "bg-cyan-400";
   return items.length ? (
@@ -228,18 +276,18 @@ function ChecklistGroup({ title, items, checked, onToggle, tone }: { title: stri
   );
 }
 
-function SimulatorStep({ action, scoreGain, category }: { action: string; scoreGain: number; category: string }) {
+function SimulatorStep({ action, scoreGain, category, selected, onToggle }: { action: string; scoreGain: number; category: string; selected: boolean; onToggle: () => void }) {
   const tone = category === "portfolio_project" ? "text-fuchsia-300" : category === "quality" ? "text-cyan-300" : "text-emerald-300";
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/20 p-4 transition hover:border-cyan-400/25 hover:bg-white/[0.04]">
+    <button type="button" onClick={onToggle} className={`w-full rounded-2xl border p-4 text-left transition hover:border-cyan-400/25 hover:bg-white/[0.04] ${selected ? "border-cyan-400/20 bg-cyan-400/[0.045]" : "border-white/10 bg-black/20 opacity-65"}`}>
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${tone}`}>{category.replace("_", " ")}</p>
           <p className="mt-2 text-sm leading-6 text-slate-300">{action}</p>
         </div>
-        <span className="shrink-0 rounded-full border border-emerald-400/20 bg-emerald-400/[0.08] px-3 py-1.5 text-sm font-semibold text-emerald-200">+{scoreGain}</span>
+        <span className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-semibold ${selected ? "border-emerald-400/20 bg-emerald-400/[0.08] text-emerald-200" : "border-white/10 bg-white/[0.04] text-slate-500"}`}>+{scoreGain}</span>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -268,6 +316,7 @@ export default function AnalysisPage() {
   const [expandedSkill, setExpandedSkill] = useState<string | null>(null);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [recruiterMode, setRecruiterMode] = useState<"student" | "recruiter">("student");
+  const [activeImprovementActions, setActiveImprovementActions] = useState<Set<string> | null>(null);
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState("");
 
@@ -297,6 +346,10 @@ export default function AnalysisPage() {
       setCheckedItems(new Set());
     }
   }, [checklistKey]);
+
+  useEffect(() => {
+    setActiveImprovementActions(null);
+  }, [report?.generatedAt]);
 
   function toggleChecklist(item: string) {
     setCheckedItems((current) => {
@@ -349,48 +402,91 @@ export default function AnalysisPage() {
     portfolioProject,
     targetJob,
   });
-  const unlockable = simulator.projectedScore - simulator.currentScore;
+  const activeActions = activeImprovementActions ?? new Set(simulator.improvements.map((improvement) => improvement.action));
+  const activeUnlockable = simulator.improvements.filter((improvement) => activeActions.has(improvement.action)).reduce((sum, improvement) => sum + improvement.scoreGain, 0);
+  const dynamicProjectedScore = Math.min(95, simulator.currentScore + activeUnlockable);
+  const unlockable = dynamicProjectedScore - simulator.currentScore;
+
+  function toggleImprovement(action: string) {
+    setActiveImprovementActions((current) => {
+      const next = new Set(current ?? simulator.improvements.map((improvement) => improvement.action));
+      if (next.has(action)) next.delete(action);
+      else next.add(action);
+      return next;
+    });
+  }
 
   return (
     <Shell>
-      <header className="relative z-10 border-b border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-          <Link href="/" className="text-sm font-semibold tracking-wide text-white">ProjectDNA</Link>
-          <div className="flex flex-wrap items-center gap-2">
+      <header className="relative z-30 border-b border-white/10 bg-[#05050a]/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[92rem] flex-col gap-4 px-6 py-4 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+          <Link href="/" className="flex items-center gap-3 text-sm font-semibold tracking-wide text-white">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-violet-400/25 bg-violet-400/10 text-xs text-violet-200">DNA</span>
+            ProjectDNA
+          </Link>
+          <div className="grid gap-2 text-xs sm:grid-cols-[minmax(160px,1fr)_minmax(180px,1fr)_auto_auto] sm:items-center">
+            <div className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2"><span className="text-slate-600">Repo</span><span className="ml-2 font-medium text-slate-200">{repo.fullName}</span></div>
+            <div className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2"><span className="text-slate-600">Role</span><span className="ml-2 font-medium text-slate-200">{target.title}</span></div>
             <Badge tone={report.analysisMode === "demo" ? "cyan" : "emerald"}>{report.analysisMode === "demo" ? "Demo snapshot" : "Live GitHub analysis"}</Badge>
-            <Link href="/report/latest" className="rounded-xl border border-white/10 px-4 py-2 text-xs text-slate-300 transition hover:bg-white/5">View full report</Link>
+            <Link href="/report/latest" className="rounded-xl bg-white px-4 py-2 text-center text-xs font-semibold text-slate-950 transition hover:bg-cyan-100">View Report</Link>
           </div>
         </div>
       </header>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-6 pb-24 pt-10 lg:px-8">
-        <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">GitHub -&gt; Skill DNA -&gt; Opportunity Fit -&gt; Opportunity Lab -&gt; Evidence Packet</p>
-            <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.035em] text-white sm:text-6xl">Interactive ProjectDNA workspace</h1>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400">Move through the evidence journey one step at a time. Nothing here is inferred from social proof; it is based on public repository signals and seeded role requirements.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge tone={target.readinessLevel === "high" ? "emerald" : target.readinessLevel === "strong" ? "cyan" : target.readinessLevel === "emerging" ? "amber" : "rose"}>{target.readinessLevel} readiness</Badge>
-            <Badge>{target.matchScore}% match</Badge>
-          </div>
-        </div>
-
+      <div className="relative z-10 mx-auto max-w-[92rem] px-6 pb-24 pt-8 lg:grid lg:grid-cols-[300px_1fr] lg:gap-8 lg:px-8">
         <ProductNav activeStep={activeStep} onStepChange={setActiveStep} />
 
-        <div className="mt-8">
-          {activeStep === "overview" && (
-            <section>
-              <SectionHeader eyebrow="Overview" title={`${repo.fullName} for ${targetJob.title}`} text={target.explanation} />
-              {analysis.confidence < 40 && <div className="mb-6 rounded-xl border border-amber-400/25 bg-amber-400/[0.07] px-5 py-4 text-sm text-amber-200">Low confidence: ProjectDNA only found limited public evidence in this repository.</div>}
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <MetricCard label="Repository" value={repo.fullName} detail={repo.language ?? "Mixed language"} />
-                <MetricCard label="Target role" value={target.title} detail={target.company} />
-                <MetricCard label="Match score" value={`${target.matchScore}%`} detail={`${target.readinessLevel} readiness`} />
+        <div className="min-w-0">
+          <div className="mb-8 overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-8">
+            <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">GitHub -&gt; Skill DNA -&gt; Opportunity Fit -&gt; Opportunity Lab -&gt; Evidence Packet</p>
+                <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.035em] text-white sm:text-6xl">Opportunity operating system</h1>
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400">Move through the evidence journey one step at a time. ProjectDNA turns public work into a buildable path toward opportunity.</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:w-[520px]">
+                <MetricCard label="Match" value={`${target.matchScore}%`} detail={target.readinessLevel} />
+                <MetricCard label="Potential" value={`${dynamicProjectedScore}%`} detail={`+${unlockable} unlock`} />
+                <MetricCard label="Gap" value={`${overlookedMeter.opportunityGap > 0 ? "+" : ""}${overlookedMeter.opportunityGap}`} detail={overlookedMeter.classification} />
                 <MetricCard label="Confidence" value={`${analysis.confidence}%`} detail={analysis.domainClassification.primaryDomain} />
               </div>
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/10 bg-[#080812]/70 p-5 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-7">
+          {activeStep === "overview" && (
+            <section>
+              <SectionHeader eyebrow="Opportunity Readiness Snapshot" title={`${repo.fullName} for ${targetJob.title}`} text="A fast executive view of what the public repository proves, where visibility is missing, and what ProjectDNA generated next." />
+              {analysis.confidence < 40 && <div className="mb-6 rounded-xl border border-amber-400/25 bg-amber-400/[0.07] px-5 py-4 text-sm text-amber-200">Low confidence: ProjectDNA only found limited public evidence in this repository.</div>}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div className="rounded-3xl border border-violet-400/20 bg-violet-400/[0.045] p-6"><p className="text-xs text-slate-500">Current Match Score</p><p className="mt-3 text-5xl font-semibold text-white">{target.matchScore}%</p><p className="mt-2 text-xs capitalize text-violet-200">{target.readinessLevel} readiness</p></div>
+                <div className="rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.045] p-6"><p className="text-xs text-slate-500">Potential Match Score</p><p className="mt-3 text-5xl font-semibold text-white">{dynamicProjectedScore}%</p><p className="mt-2 text-xs text-emerald-200">+{unlockable} points unlockable</p></div>
+                <div className="rounded-3xl border border-cyan-400/20 bg-cyan-400/[0.045] p-6"><p className="text-xs text-slate-500">Opportunity Gap</p><p className="mt-3 text-5xl font-semibold text-white">{overlookedMeter.opportunityGap > 0 ? "+" : ""}{overlookedMeter.opportunityGap}</p><p className="mt-2 text-xs text-cyan-200">{overlookedMeter.classification}</p></div>
+                <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6"><p className="text-xs text-slate-500">Readiness Level</p><p className="mt-3 text-3xl font-semibold capitalize text-white">{target.readinessLevel}</p><p className="mt-2 text-xs text-slate-500">{analysis.confidence}% analysis confidence</p></div>
+              </div>
+              <div className="mt-6 rounded-3xl border border-white/10 bg-gradient-to-r from-violet-500/[0.08] via-cyan-500/[0.04] to-emerald-500/[0.06] p-6">
+                <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                  <div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">From hidden work to visible opportunity</p><h3 className="mt-2 text-2xl font-semibold text-white">ProjectDNA evidence flow</h3></div>
+                  <p className="text-xs text-slate-500">Repository signals become a recruiter-ready packet.</p>
+                </div>
+                <div className="grid gap-3 lg:grid-cols-5">
+                  {[
+                    ["GitHub Evidence", `${fileTreeSummary.selectedFiles} files selected`],
+                    ["Skill DNA", `${analysis.detectedSkills.length} skills found`],
+                    ["Fit Score", `${target.matchScore}% match`],
+                    ["Build Plan", portfolioProject.difficulty],
+                    ["Evidence Packet", "Ready"],
+                  ].map(([label, metric], index) => (
+                    <div key={label} className="relative rounded-2xl border border-white/10 bg-black/25 p-4">
+                      {index < 4 && <div className="absolute left-full top-1/2 hidden h-px w-3 bg-cyan-400/30 lg:block" />}
+                      <p className="text-sm font-semibold text-white">{label}</p>
+                      <p className="mt-2 text-xs text-slate-500">{metric}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <div className="mt-6 grid gap-4 md:grid-cols-3">
-                <MetricCard label="Evidence files selected" value={fileTreeSummary.selectedFiles} detail={`${fileTreeSummary.totalFiles.toLocaleString()} public files scanned`} />
+                <MetricCard label="Repository" value={repo.fullName} detail={repo.language ?? "Mixed language"} />
                 <MetricCard label="Top extensions" value={fileTreeSummary.topExtensions.slice(0, 3).map((item) => item.extension).join(" / ") || "None"} />
                 <MetricCard label="Project complexity" value={analysis.projectComplexity.level} detail={`${analysis.projectComplexity.score}/100`} />
               </div>
@@ -401,7 +497,8 @@ export default function AnalysisPage() {
           {activeStep === "skills" && (
             <section>
               <SectionHeader eyebrow="Skill DNA" title="Repo-derived capability signals" text="Filter by category, then open a skill to inspect the evidence lines and source files that support it." />
-              <SkillRadar skills={analysis.detectedSkills} />
+              <SkillDnaMap skills={analysis.detectedSkills} />
+              <div className="mt-6"><SkillRadar skills={analysis.detectedSkills} /></div>
               <div className="mt-6 flex flex-wrap gap-2">
                 {skillFilters.map((filter) => <button key={filter} type="button" onClick={() => setSkillFilter(filter)} className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${skillFilter === filter ? "border-violet-400/35 bg-violet-400/15 text-white" : "border-white/10 bg-white/5 text-slate-400 hover:text-white"}`}>{filter.replace("_", " / ")}</button>)}
               </div>
@@ -416,21 +513,26 @@ export default function AnalysisPage() {
               <SectionHeader eyebrow="Opportunity Fit" title={`${target.matchScore}% match for ${target.title}`} text="The score is calculated from seeded role requirements, detected repo skills, evidence strength, domain alignment, and project complexity." />
               <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
                 <div className="rounded-3xl border border-white/10 bg-[#0d0d16]/85 p-6">
-                  <h3 className="text-lg font-semibold text-white">Matched requirements</h3>
-                  <div className="mt-5 space-y-3">
+                  <h3 className="text-lg font-semibold text-white">Matched requirement table</h3>
+                  <div className="mt-5 overflow-hidden rounded-2xl border border-white/10">
+                    <div className="grid grid-cols-[1fr_1fr_90px] gap-px bg-white/10 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                      <div className="bg-[#0d0d16] p-3">Requirement</div>
+                      <div className="bg-[#0d0d16] p-3">Repo evidence</div>
+                      <div className="bg-[#0d0d16] p-3 text-right">Strength</div>
+                    </div>
                     {target.matchedSkills.length ? target.matchedSkills.map((match) => (
-                      <div key={`${match.jobSkill}-${match.matchedRepoSkill}`} className="rounded-xl border border-white/[0.08] bg-white/[0.025] p-4">
-                        <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm text-slate-200">{match.jobSkill} <span className="text-slate-600">matched by</span> <span className="text-cyan-300">{match.matchedRepoSkill}</span></p><span className="text-xs text-slate-500">{match.strength}% strength</span></div>
-                        <p className="mt-2 text-xs leading-5 text-slate-500">{match.evidence[0]}</p>
+                      <div key={`${match.jobSkill}-${match.matchedRepoSkill}`} className="grid grid-cols-[1fr_1fr_90px] gap-px border-t border-white/10 bg-white/10">
+                        <div className="bg-[#0d0d16] p-4 text-sm text-slate-200">{match.jobSkill}</div>
+                        <div className="bg-[#0d0d16] p-4"><p className="text-sm text-cyan-300">{match.matchedRepoSkill}</p><p className="mt-1 text-xs leading-5 text-slate-500">{match.evidence[0]}</p></div>
+                        <div className="bg-[#0d0d16] p-4 text-right text-sm font-semibold text-white">{match.strength}%</div>
                       </div>
                     )) : <p className="rounded-xl border border-dashed border-white/10 p-5 text-sm text-slate-500">No target requirements have defensible repository evidence yet.</p>}
                   </div>
                 </div>
                 <div className="space-y-6">
                   <div className="rounded-3xl border border-violet-400/20 bg-violet-400/[0.04] p-6">
-                    <p className="text-xs text-slate-500">Calculated match</p>
-                    <p className="mt-2 text-6xl font-semibold tracking-tight text-white">{target.matchScore}<span className="text-xl text-slate-500">%</span></p>
-                    <p className="mt-3 inline-flex rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1 text-xs font-medium capitalize text-violet-200">{target.readinessLevel} readiness</p>
+                    <RadialScore score={target.matchScore} label="Calculated match" />
+                    <p className="mt-5 text-center"><span className="inline-flex rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1 text-xs font-medium capitalize text-violet-200">{target.readinessLevel} readiness</span></p>
                   </div>
                   <div className="rounded-3xl border border-white/10 bg-white/[0.025] p-6">
                     <h3 className="text-sm font-semibold text-white">Score breakdown</h3>
@@ -456,12 +558,18 @@ export default function AnalysisPage() {
           {activeStep === "gaps" && (
             <section>
               <SectionHeader eyebrow="Gap Map" title="The bridge from current proof to target opportunity" text={opportunity.gapAnalysis.overallAdvice} />
+              <div className="mb-6 grid gap-3 md:grid-cols-2">
+                <div className="rounded-2xl border border-rose-400/20 bg-rose-400/[0.045] p-5 text-sm leading-6 text-rose-100">This is where social capital usually fills the gap.</div>
+                <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.045] p-5 text-sm leading-6 text-emerald-100">ProjectDNA replaces that with a buildable evidence path.</div>
+              </div>
               <div className="grid gap-4 lg:grid-cols-3">
-                <div className="rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.035] p-6">
+                <div className="relative rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.035] p-6">
+                  <div className="absolute -right-4 top-1/2 hidden h-px w-8 bg-gradient-to-r from-emerald-400/50 to-rose-400/50 lg:block" />
                   <h3 className="text-lg font-semibold text-emerald-200">Current Proof</h3>
                   <div className="mt-4"><EvidenceList items={opportunity.gapAnalysis.strongestEvidence} empty="No matched evidence available yet." tone="emerald" /></div>
                 </div>
-                <div className="rounded-3xl border border-rose-400/20 bg-rose-400/[0.035] p-6">
+                <div className="relative rounded-3xl border border-rose-400/20 bg-rose-400/[0.035] p-6">
+                  <div className="absolute -right-4 top-1/2 hidden h-px w-8 bg-gradient-to-r from-rose-400/50 to-cyan-400/50 lg:block" />
                   <h3 className="text-lg font-semibold text-rose-200">Missing Signals</h3>
                   <div className="mt-4"><EvidenceList items={opportunity.gapAnalysis.criticalGaps} empty="No critical required gaps detected." tone="rose" /></div>
                 </div>
@@ -493,7 +601,12 @@ export default function AnalysisPage() {
                     <div className="flex items-end justify-between"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-fuchsia-300">Evidence-building progress</p><p className="text-2xl font-semibold text-white">{progress}%</p></div>
                     <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/[0.08]"><div className="h-full rounded-full bg-gradient-to-r from-fuchsia-500 to-cyan-400" style={{ width: `${progress}%` }} /></div>
                     <p className="mt-2 text-xs text-slate-500">{checkedCount}/{checklistItems.length} checklist items complete locally</p>
+                    {progress === 100 && <p className="mt-3 rounded-full border border-emerald-400/20 bg-emerald-400/[0.08] px-3 py-1.5 text-center text-xs font-semibold text-emerald-200">Mission complete</p>}
                   </div>
+                </div>
+                <div className="relative mt-7 rounded-2xl border border-violet-400/20 bg-violet-400/[0.055] p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">What this proves</p>
+                  <div className="mt-4 flex flex-wrap gap-2">{portfolioProject.skillsToProve.map((skill) => <Badge key={skill} tone="violet">{skill}</Badge>)}</div>
                 </div>
                 <div className="relative mt-8 grid gap-5 lg:grid-cols-3">
                   <ChecklistGroup title="Features" items={portfolioProject.features} checked={checkedItems} onToggle={toggleChecklist} tone="fuchsia" />
@@ -514,7 +627,7 @@ export default function AnalysisPage() {
               <SectionHeader eyebrow="Opportunity Lab" title="Simulate the next opportunity unlock" text="This lab turns the current ProjectDNA analysis into a forward-looking simulator: what improves, what remains hidden, and how a recruiter might read the evidence." />
               <div className="mb-6 grid gap-4 md:grid-cols-3">
                 <MetricCard label="Current Match" value={`${simulator.currentScore}%`} detail={target.readinessLevel} />
-                <MetricCard label="Potential Match" value={`${simulator.projectedScore}%`} detail={simulator.projectedScore >= 75 ? "Strong Potential" : "Evidence still developing"} />
+                <MetricCard label="Potential Match" value={`${dynamicProjectedScore}%`} detail={dynamicProjectedScore >= 75 ? "Strong Potential" : "Evidence still developing"} />
                 <MetricCard label="Opportunity Gap" value={`${overlookedMeter.opportunityGap > 0 ? "+" : ""}${overlookedMeter.opportunityGap}`} detail={overlookedMeter.classification} />
               </div>
 
@@ -527,7 +640,7 @@ export default function AnalysisPage() {
                         <h3 className="mt-3 text-2xl font-semibold text-white">Current to potential readiness</h3>
                         <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">Projected gains come from missing skills, weak evidence signals, and the recommended portfolio project. Scores are capped at 95.</p>
                       </div>
-                      <Badge tone={simulator.projectedScore >= 75 ? "emerald" : simulator.projectedScore >= 55 ? "cyan" : "amber"}>{simulator.projectedScore >= 75 ? "Strong Potential" : "Growth Path"}</Badge>
+                      <Badge tone={dynamicProjectedScore >= 75 ? "emerald" : dynamicProjectedScore >= 55 ? "cyan" : "amber"}>{dynamicProjectedScore >= 75 ? "Strong Potential" : "Growth Path"}</Badge>
                     </div>
                     <div className="mt-7 grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
                       <div className="rounded-2xl border border-white/10 bg-black/25 p-5">
@@ -538,14 +651,14 @@ export default function AnalysisPage() {
                       <div className="hidden text-cyan-300 sm:block"><ArrowIcon /></div>
                       <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.045] p-5">
                         <p className="text-xs text-slate-500">Potential</p>
-                        <p className="mt-2 text-5xl font-semibold text-white">{simulator.projectedScore}%</p>
-                        <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/[0.08]"><div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-700" style={{ width: `${simulator.projectedScore}%` }} /></div>
+                        <p className="mt-2 text-5xl font-semibold text-white">{dynamicProjectedScore}%</p>
+                        <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/[0.08]"><div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-700" style={{ width: `${dynamicProjectedScore}%` }} /></div>
                       </div>
                     </div>
-                    <div className="mt-5 rounded-xl border border-emerald-400/15 bg-emerald-400/[0.04] px-4 py-3 text-sm text-emerald-100">Unlockable opportunity: <span className="font-semibold">+{unlockable}%</span></div>
+                    <div className="mt-5 rounded-xl border border-emerald-400/15 bg-emerald-400/[0.04] px-4 py-3 text-sm text-emerald-100">Unlocked <span className="font-semibold">+{unlockable} points</span> from selected improvements.</div>
                   </div>
                   <div className="grid gap-3 p-6 sm:p-8">
-                    {simulator.improvements.map((improvement) => <SimulatorStep key={`${improvement.category}-${improvement.action}`} action={improvement.action} scoreGain={improvement.scoreGain} category={improvement.category} />)}
+                    {simulator.improvements.map((improvement) => <SimulatorStep key={`${improvement.category}-${improvement.action}`} action={improvement.action} scoreGain={improvement.scoreGain} category={improvement.category} selected={activeActions.has(improvement.action)} onToggle={() => toggleImprovement(improvement.action)} />)}
                   </div>
                 </div>
 
@@ -603,6 +716,7 @@ export default function AnalysisPage() {
             <section>
               <SectionHeader eyebrow="Evidence Packet" title={evidencePacket.headline} text={evidencePacket.summary} />
               {copyError && <p role="alert" className="mb-4 text-sm text-rose-400">{copyError}</p>}
+              <div className="mb-6 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.045] p-5 text-lg font-medium text-cyan-50">Send this instead of relying on a referral.</div>
               <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
                 <div className="rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-[#0c1118] to-[#0c0a14] p-6 sm:p-8">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">Recruiter pitch</p>
@@ -628,6 +742,7 @@ export default function AnalysisPage() {
             </section>
           )}
         </div>
+      </div>
       </div>
     </Shell>
   );

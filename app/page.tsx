@@ -146,19 +146,24 @@ export default function LandingPage() {
         <a href="#analyze" className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:bg-white/10 hover:text-white">Analyze a repository</a>
       </nav>
 
-      <section className="relative z-10 mx-auto max-w-5xl px-6 pb-16 pt-16 text-center sm:pt-24 lg:px-8">
+      <section className="relative z-10 mx-auto max-w-6xl px-6 pb-16 pt-16 text-center sm:pt-24 lg:px-8">
         <div className="mx-auto mb-7 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-500/10 px-3.5 py-2 text-xs font-medium text-violet-200">
           <span className="h-1.5 w-1.5 rounded-full bg-violet-300" /> Theme B5: Opportunity access is socially gated
         </div>
-        <h1 className="text-balance text-5xl font-semibold tracking-[-0.045em] text-white sm:text-7xl lg:text-[5.25rem] lg:leading-[0.98]">
-          Turn your GitHub into <span className="bg-gradient-to-r from-violet-300 via-fuchsia-300 to-cyan-300 bg-clip-text text-transparent">proof of opportunity-readiness.</span>
+        <h1 className="text-balance text-5xl font-semibold tracking-[-0.045em] text-white sm:text-7xl lg:text-[5.4rem] lg:leading-[0.96]">
+          Opportunities still travel through networks. <span className="bg-gradient-to-r from-violet-300 via-fuchsia-300 to-cyan-300 bg-clip-text text-transparent">ProjectDNA makes capability visible.</span>
         </h1>
         <p className="mx-auto mt-7 max-w-2xl text-balance text-base leading-7 text-slate-400 sm:text-lg">
-          ProjectDNA analyses what you have actually built, extracts skill evidence, matches it to real opportunity requirements, and shows what project to build next.
+          Paste a public GitHub repo. Get skill DNA, opportunity fit, a gap bridge, a next-build mission, and a recruiter-ready evidence packet.
         </p>
         <p className="mt-5 text-sm font-medium tracking-wide text-slate-200">Replacing social capital with demonstrated potential.</p>
 
-        <div className="mx-auto mt-10 grid max-w-4xl gap-3 sm:grid-cols-5">
+        <div className="mt-9 flex flex-wrap justify-center gap-3">
+          <a href="#analyze" className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-cyan-100">Analyze GitHub <ArrowIcon /></a>
+          <a href="#demos" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-slate-200 transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.08]">Try a demo snapshot</a>
+        </div>
+
+        <div className="mx-auto mt-10 grid max-w-5xl gap-3 sm:grid-cols-5">
           {["GitHub", "Skill DNA", "Opportunity Fit", "Build Plan", "Evidence Packet"].map((stage, index) => (
             <div key={stage} className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-xs font-medium text-slate-300">
               <span className="mr-2 text-violet-300">{index + 1}</span>{stage}
@@ -167,8 +172,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="analyze" className="relative z-10 mx-auto max-w-5xl scroll-mt-6 px-6 pb-20 lg:px-8">
-        <div className="rounded-3xl border border-white/10 bg-[#0b0b13]/85 p-4 shadow-glow backdrop-blur-xl sm:p-6">
+      <section id="analyze" className="relative z-10 mx-auto max-w-6xl scroll-mt-6 px-6 pb-20 lg:px-8">
+        <div className="rounded-[2rem] border border-white/10 bg-[#0b0b13]/85 p-4 shadow-glow backdrop-blur-xl sm:p-6">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">Start the journey</p>
@@ -200,16 +205,18 @@ export default function LandingPage() {
             </div>
           )}
 
-          <div className="mt-5 rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.035] p-4">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div id="demos" className="mt-5 rounded-3xl border border-cyan-400/15 bg-cyan-400/[0.035] p-5">
+            <div className="flex flex-col gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">Try Demo Snapshot</p>
-                <p className="mt-1 text-xs text-slate-500">Precomputed examples load instantly and do not call GitHub.</p>
+                <p className="mt-1 text-sm text-slate-500">Curated no-API scenarios for hackathon judging and rate-limit-safe demos.</p>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid gap-3 md:grid-cols-3">
                 {demoScenarios.map((scenario, index) => (
-                  <button key={scenario.id} type="button" disabled={isLoading} onClick={() => loadDemoSnapshot(index)} aria-label={`Load ${scenario.label}`} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-cyan-400/25 hover:bg-cyan-400/[0.08] hover:text-white disabled:cursor-not-allowed disabled:opacity-50">
-                    {scenario.label}
+                  <button key={scenario.id} type="button" disabled={isLoading} onClick={() => loadDemoSnapshot(index)} aria-label={`Load ${scenario.label}`} className="group rounded-2xl border border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1 hover:border-cyan-400/25 hover:bg-cyan-400/[0.08] disabled:cursor-not-allowed disabled:opacity-50">
+                    <span className="text-sm font-semibold text-white group-hover:text-cyan-100">{scenario.label}</span>
+                    <span className="mt-2 block text-xs leading-5 text-slate-500">{scenario.description}</span>
+                    <span className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-cyan-300">Launch demo <ArrowIcon /></span>
                   </button>
                 ))}
               </div>
