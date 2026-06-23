@@ -51,9 +51,9 @@ function saveAndOpenAnalysis(result: AnalyzeSuccessResponse, router: ReturnType<
 
 function FlowStep({ number, title, text }: { number: string; title: string; text: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 backdrop-blur-sm transition hover:-translate-y-1 hover:border-violet-400/30 hover:bg-white/[0.055]">
-      <span className="mb-7 flex h-9 w-9 items-center justify-center rounded-full border border-violet-400/30 bg-violet-500/10 text-xs font-semibold text-violet-200">{number}</span>
-      <h3 className="text-lg font-semibold text-white">{title}</h3>
+    <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+      <span className="mb-4 flex h-8 w-8 items-center justify-center rounded-lg border border-blue-400/20 bg-blue-500/10 text-xs font-semibold text-blue-200">{number}</span>
+      <h3 className="text-sm font-semibold text-white">{title}</h3>
       <p className="mt-2 text-sm leading-6 text-slate-400">{text}</p>
     </div>
   );
@@ -61,8 +61,8 @@ function FlowStep({ number, title, text }: { number: string; title: string; text
 
 function FeaturePill({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-slate-300">
-      <span className="h-1.5 w-1.5 rounded-full bg-violet-400 shadow-[0_0_12px_rgba(167,139,250,0.9)]" />
+    <div className="flex items-center gap-3 rounded-xl border border-slate-800 bg-[#0b1220] px-4 py-3 text-sm text-slate-300">
+      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
       {children}
     </div>
   );
@@ -134,61 +134,54 @@ export default function LandingPage() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#05050a] text-slate-100">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(109,40,217,0.34),transparent_38%),radial-gradient(circle_at_90%_35%,rgba(8,145,178,0.14),transparent_28%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.018)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.018)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_80%)]" />
+    <main className="relative min-h-screen overflow-hidden bg-[#050814] text-slate-100">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-12%,rgba(37,99,235,0.16),transparent_34%)]" />
 
       <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
         <a href="#" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-white">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-violet-400/30 bg-violet-500/10 text-violet-300"><Mark /></span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-blue-400/20 bg-blue-500/10 text-blue-200"><Mark /></span>
           ProjectDNA
         </a>
         <a href="#analyze" className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:bg-white/10 hover:text-white">Analyze a repository</a>
       </nav>
 
-      <section className="relative z-10 mx-auto max-w-6xl px-6 pb-16 pt-16 text-center sm:pt-24 lg:px-8">
-        <div className="mx-auto mb-7 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-500/10 px-3.5 py-2 text-xs font-medium text-violet-200">
-          <span className="h-1.5 w-1.5 rounded-full bg-violet-300" /> Theme B5: Opportunity access is socially gated
-        </div>
-        <h1 className="text-balance text-5xl font-semibold tracking-[-0.045em] text-white sm:text-7xl lg:text-[5.4rem] lg:leading-[0.96]">
-          Opportunities still travel through networks. <span className="bg-gradient-to-r from-violet-300 via-fuchsia-300 to-cyan-300 bg-clip-text text-transparent">ProjectDNA makes capability visible.</span>
+      <section className="relative z-10 mx-auto max-w-5xl px-6 pb-12 pt-14 text-center sm:pt-20 lg:px-8">
+        <h1 className="text-balance text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:leading-[1.02]">
+          Make public GitHub work readable as <span className="bg-gradient-to-r from-blue-200 to-emerald-200 bg-clip-text text-transparent">opportunity evidence.</span>
         </h1>
         <p className="mx-auto mt-7 max-w-2xl text-balance text-base leading-7 text-slate-400 sm:text-lg">
-          Paste a public GitHub repo. Get skill DNA, opportunity fit, a gap bridge, a next-build mission, and a recruiter-ready evidence packet.
+          ProjectDNA turns a repository into skill evidence, fit scoring, gap analysis, a recommended next build, and a recruiter-facing evidence packet.
         </p>
-        <p className="mt-5 text-sm font-medium tracking-wide text-slate-200">Replacing social capital with demonstrated potential.</p>
 
         <div className="mt-9 flex flex-wrap justify-center gap-3">
           <a href="#analyze" className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-cyan-100">Analyze GitHub <ArrowIcon /></a>
           <a href="#demos" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-slate-200 transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.08]">Try a demo snapshot</a>
         </div>
 
-        <div className="mx-auto mt-10 grid max-w-5xl gap-3 sm:grid-cols-5">
-          {["GitHub", "Skill DNA", "Opportunity Fit", "Build Plan", "Evidence Packet"].map((stage, index) => (
-            <div key={stage} className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-xs font-medium text-slate-300">
-              <span className="mr-2 text-violet-300">{index + 1}</span>{stage}
-            </div>
+        <div className="mx-auto mt-8 grid max-w-3xl gap-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-4 text-left sm:grid-cols-4">
+          {["Choose demo or paste GitHub", "Pick target role", "Analyze", "Review workspace"].map((stage, index) => (
+            <div key={stage} className="text-sm text-slate-300"><span className="mr-2 text-blue-300">{index + 1}.</span>{stage}</div>
           ))}
         </div>
       </section>
 
       <section id="analyze" className="relative z-10 mx-auto max-w-6xl scroll-mt-6 px-6 pb-20 lg:px-8">
-        <div className="rounded-[2rem] border border-white/10 bg-[#0b0b13]/85 p-4 shadow-glow backdrop-blur-xl sm:p-6">
+        <div className="rounded-2xl border border-slate-800 bg-[#0b1220]/85 p-4 shadow-xl shadow-black/20 backdrop-blur-xl sm:p-6">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">Start the journey</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">Step 1</p>
               <h2 className="mt-2 text-2xl font-semibold text-white">Analyze live GitHub evidence</h2>
               <p className="mt-2 text-sm text-slate-500">Public repositories only. No login required. GitHub API limits apply.</p>
             </div>
           </div>
           <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-[1fr_240px_auto]">
             <label className="sr-only" htmlFor="repo-url">GitHub repository URL</label>
-            <div className="flex min-w-0 items-center gap-3 rounded-xl border border-white/10 bg-black/25 px-4 focus-within:border-violet-400/50">
+            <div className="flex min-w-0 items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/70 px-4 focus-within:border-blue-400/50">
               <svg className="h-5 w-5 shrink-0 text-slate-500" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7.5l-1.7 1.7m2.2 6.3a5 5 0 0 0-7.5-.5l-3 3A5 5 0 0 0 11 21l1.7-1.7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
               <input id="repo-url" type="url" value={repoUrl} onChange={(event) => setRepoUrl(event.target.value)} placeholder="https://github.com/you/project" className="h-14 w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-600" disabled={isLoading} />
             </div>
             <label className="sr-only" htmlFor="target-role">Target role</label>
-            <select id="target-role" value={selectedRole} onChange={(event) => setSelectedRole(event.target.value as (typeof roles)[number])} className="h-14 rounded-xl border border-white/10 bg-[#11111a] px-4 text-sm text-slate-200 outline-none focus:border-violet-400/50" disabled={isLoading}>
+            <select id="target-role" value={selectedRole} onChange={(event) => setSelectedRole(event.target.value as (typeof roles)[number])} className="h-14 rounded-xl border border-slate-800 bg-slate-950 px-4 text-sm text-slate-200 outline-none focus:border-blue-400/50" disabled={isLoading}>
               {roles.map((role) => <option key={role}>{role}</option>)}
             </select>
             <button type="submit" disabled={isLoading} className="relative flex h-14 items-center justify-center gap-2 overflow-hidden rounded-xl bg-white px-5 text-sm font-semibold text-slate-950 transition hover:bg-violet-100 disabled:cursor-wait disabled:text-slate-500 sm:min-w-48">
@@ -205,18 +198,18 @@ export default function LandingPage() {
             </div>
           )}
 
-          <div id="demos" className="mt-5 rounded-3xl border border-cyan-400/15 bg-cyan-400/[0.035] p-5">
+          <div id="demos" className="mt-5 rounded-2xl border border-slate-800 bg-slate-950/60 p-5">
             <div className="flex flex-col gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">Try Demo Snapshot</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-300">Or choose a demo</p>
                 <p className="mt-1 text-sm text-slate-500">Curated no-API scenarios for hackathon judging and rate-limit-safe demos.</p>
               </div>
               <div className="grid gap-3 md:grid-cols-3">
                 {demoScenarios.map((scenario, index) => (
-                  <button key={scenario.id} type="button" disabled={isLoading} onClick={() => loadDemoSnapshot(index)} aria-label={`Load ${scenario.label}`} className="group rounded-2xl border border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1 hover:border-cyan-400/25 hover:bg-cyan-400/[0.08] disabled:cursor-not-allowed disabled:opacity-50">
+                  <button key={scenario.id} type="button" disabled={isLoading} onClick={() => loadDemoSnapshot(index)} aria-label={`Load ${scenario.label}`} className="group rounded-xl border border-slate-800 bg-[#0b1220] p-4 text-left transition hover:border-blue-400/30 disabled:cursor-not-allowed disabled:opacity-50">
                     <span className="text-sm font-semibold text-white group-hover:text-cyan-100">{scenario.label}</span>
                     <span className="mt-2 block text-xs leading-5 text-slate-500">{scenario.description}</span>
-                    <span className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-cyan-300">Launch demo <ArrowIcon /></span>
+                    <span className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-blue-300">Launch demo <ArrowIcon /></span>
                   </button>
                 ))}
               </div>
@@ -225,41 +218,29 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="relative z-10 mx-auto max-w-7xl px-6 py-16 lg:px-8">
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.025]">
-          <div className="grid md:grid-cols-2">
-            <div className="border-b border-white/10 p-8 md:border-b-0 md:border-r lg:p-12">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Before</p>
-              <p className="mt-5 max-w-md text-2xl font-medium leading-snug text-slate-400">Cold applications rely on resumes and referrals.</p>
-            </div>
-            <div className="relative p-8 lg:p-12">
-              <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-cyan-500/5" />
-              <div className="relative"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">After</p><p className="mt-5 max-w-md text-2xl font-medium leading-snug text-white">ProjectDNA shows public repo-derived evidence from actual work.</p></div>
-            </div>
+      <section className="relative z-10 mx-auto grid max-w-6xl gap-5 px-6 py-14 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+        <div className="rounded-2xl border border-slate-800 bg-[#0b1220]/80 p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">Problem</p>
+          <h2 className="mt-3 text-2xl font-semibold text-white">Opportunity access is often socially gated.</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-400">Students may have real capability in public work, but applications still compress that work into resumes, referrals, and keywords.</p>
+        </div>
+        <div className="rounded-2xl border border-slate-800 bg-[#0b1220]/80 p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">How ProjectDNA works</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <FlowStep number="01" title="Read repo evidence" text="Fetches public metadata, README, file tree, and selected snippets." />
+            <FlowStep number="02" title="Extract Skill DNA" text="Finds deterministic skill and quality signals from repo content." />
+            <FlowStep number="03" title="Score opportunity fit" text="Compares evidence to seeded role requirements." />
+            <FlowStep number="04" title="Generate next build" text="Turns gaps into a concrete portfolio project and packet." />
           </div>
         </div>
       </section>
 
-      <section className="relative z-10 mx-auto max-w-7xl px-6 py-20 lg:px-8">
-        <div className="mb-10 max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">How it works</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">A deterministic evidence pipeline, not a chatbot.</h2>
-          <p className="mt-4 text-sm leading-6 text-slate-500">Every result travels through inspectable local rules, from public repository input to an evidence packet.</p>
+      <section className="relative z-10 mx-auto max-w-6xl px-6 pb-16 lg:px-8">
+        <div className="grid gap-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-5 sm:grid-cols-3">
+          <FeaturePill>Repo-derived evidence</FeaturePill>
+          <FeaturePill>Custom scoring logic</FeaturePill>
+          <FeaturePill>Recommended next build</FeaturePill>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-          <FlowStep number="01" title="GitHub ingestion" text="Reads public metadata, README, file tree, and bounded code snippets." />
-          <FlowStep number="02" title="Skill DNA" text="Detects skills from languages, dependencies, paths, and implementation patterns." />
-          <FlowStep number="03" title="Opportunity fit" text="Applies a custom weighted formula against seeded role requirements." />
-          <FlowStep number="04" title="Gap bridge" text="Turns missing evidence and weak signals into the next build plan." />
-          <FlowStep number="05" title="Evidence packet" text="Packages repository signals, honest limitations, and next steps for sharing." />
-        </div>
-      </section>
-
-      <section className="relative z-10 mx-auto max-w-4xl px-6 py-20 text-center lg:px-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">Built for fairer access</p>
-        <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Potential should be legible without an introduction.</h2>
-        <div className="mx-auto mt-10 grid max-w-2xl gap-3 sm:grid-cols-3"><FeaturePill>Not a resume builder</FeaturePill><FeaturePill>Not a chatbot</FeaturePill><FeaturePill>Evidence-first opportunity access</FeaturePill></div>
-        <a href="#analyze" className="mt-10 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-100">Start ProjectDNA <ArrowIcon /></a>
       </section>
 
       <footer className="relative z-10 border-t border-white/10 px-6 py-8">

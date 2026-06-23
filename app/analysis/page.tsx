@@ -44,20 +44,19 @@ function CheckIcon({ className = "h-4 w-4" }: { className?: string }) {
 
 function Badge({ children, tone = "violet" }: { children: React.ReactNode; tone?: "violet" | "cyan" | "emerald" | "amber" | "rose" }) {
   const styles = {
-    violet: "border-violet-400/25 bg-violet-400/10 text-violet-200",
-    cyan: "border-cyan-400/20 bg-cyan-400/[0.07] text-cyan-200",
-    emerald: "border-emerald-400/20 bg-emerald-400/[0.07] text-emerald-200",
-    amber: "border-amber-400/20 bg-amber-400/[0.07] text-amber-200",
-    rose: "border-rose-400/20 bg-rose-400/[0.07] text-rose-200",
+    violet: "border-blue-400/20 bg-blue-500/10 text-blue-200",
+    cyan: "border-blue-400/20 bg-blue-500/10 text-blue-200",
+    emerald: "border-emerald-400/20 bg-emerald-500/10 text-emerald-200",
+    amber: "border-amber-400/20 bg-amber-500/10 text-amber-200",
+    rose: "border-rose-400/20 bg-rose-500/10 text-rose-200",
   };
   return <span className={`inline-flex rounded-full border px-3 py-1.5 text-xs font-medium ${styles[tone]}`}>{children}</span>;
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#05050a] text-slate-100">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_45%_-10%,rgba(109,40,217,0.32),transparent_38%),radial-gradient(circle_at_95%_30%,rgba(8,145,178,0.14),transparent_25%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.016)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.016)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_75%)]" />
+    <main className="relative min-h-screen overflow-hidden bg-[#050814] text-slate-100">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(37,99,235,0.16),transparent_34%)]" />
       {children}
     </main>
   );
@@ -80,9 +79,9 @@ function EmptyState() {
 
 function MetricCard({ label, value, detail }: { label: string; value: string | number; detail?: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+    <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
       <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-2 text-2xl font-semibold text-white">{value}</p>
+      <p className="mt-1.5 text-xl font-semibold text-white">{value}</p>
       {detail && <p className="mt-1 text-xs text-slate-600">{detail}</p>}
     </div>
   );
@@ -90,10 +89,18 @@ function MetricCard({ label, value, detail }: { label: string; value: string | n
 
 function SectionHeader({ eyebrow, title, text }: { eyebrow: string; title: string; text?: string }) {
   return (
-    <div className="mb-7">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">{eyebrow}</p>
-      <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">{title}</h2>
+    <div className="mb-5">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">{eyebrow}</p>
+      <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">{title}</h2>
       {text && <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">{text}</p>}
+    </div>
+  );
+}
+
+function StepHelp({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-5 rounded-xl border border-blue-400/15 bg-blue-500/[0.06] px-4 py-3 text-sm leading-6 text-blue-100">
+      <span className="font-semibold text-blue-200">How to use this: </span>{children}
     </div>
   );
 }
@@ -418,31 +425,31 @@ export default function AnalysisPage() {
 
   return (
     <Shell>
-      <header className="relative z-30 border-b border-white/10 bg-[#05050a]/80 backdrop-blur-xl">
+      <header className="relative z-30 border-b border-slate-800 bg-[#050814]/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[92rem] flex-col gap-4 px-6 py-4 sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <Link href="/" className="flex items-center gap-3 text-sm font-semibold tracking-wide text-white">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-violet-400/25 bg-violet-400/10 text-xs text-violet-200">DNA</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-xs text-blue-200">DNA</span>
             ProjectDNA
           </Link>
           <div className="grid gap-2 text-xs sm:grid-cols-[minmax(160px,1fr)_minmax(180px,1fr)_auto_auto] sm:items-center">
-            <div className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2"><span className="text-slate-600">Repo</span><span className="ml-2 font-medium text-slate-200">{repo.fullName}</span></div>
-            <div className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2"><span className="text-slate-600">Role</span><span className="ml-2 font-medium text-slate-200">{target.title}</span></div>
+            <div className="rounded-xl border border-slate-800 bg-slate-950/70 px-3 py-2"><span className="text-slate-600">Repo</span><span className="ml-2 font-medium text-slate-200">{repo.fullName}</span></div>
+            <div className="rounded-xl border border-slate-800 bg-slate-950/70 px-3 py-2"><span className="text-slate-600">Role</span><span className="ml-2 font-medium text-slate-200">{target.title}</span></div>
             <Badge tone={report.analysisMode === "demo" ? "cyan" : "emerald"}>{report.analysisMode === "demo" ? "Demo snapshot" : "Live GitHub analysis"}</Badge>
             <Link href="/report/latest" className="rounded-xl bg-white px-4 py-2 text-center text-xs font-semibold text-slate-950 transition hover:bg-cyan-100">View Report</Link>
           </div>
         </div>
       </header>
 
-      <div className="relative z-10 mx-auto max-w-[92rem] px-6 pb-24 pt-8 lg:grid lg:grid-cols-[300px_1fr] lg:gap-8 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-[88rem] px-6 pb-20 pt-6 lg:grid lg:grid-cols-[240px_1fr] lg:gap-6 lg:px-8">
         <ProductNav activeStep={activeStep} onStepChange={setActiveStep} />
 
         <div className="min-w-0">
-          <div className="mb-8 overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-8">
+          <div className="mb-6 overflow-hidden rounded-2xl border border-slate-800 bg-[#0b1220]/80 p-5 shadow-xl shadow-black/20 backdrop-blur-xl sm:p-6">
             <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">GitHub -&gt; Skill DNA -&gt; Opportunity Fit -&gt; Opportunity Lab -&gt; Evidence Packet</p>
-                <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.035em] text-white sm:text-6xl">Opportunity operating system</h1>
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400">Move through the evidence journey one step at a time. ProjectDNA turns public work into a buildable path toward opportunity.</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">Analysis workspace</p>
+                <h1 className="mt-2 max-w-4xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">Opportunity readiness review</h1>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">Review the repo-derived evidence, role fit, gaps, next build, and shareable packet.</p>
               </div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:w-[520px]">
                 <MetricCard label="Match" value={`${target.matchScore}%`} detail={target.readinessLevel} />
@@ -453,20 +460,21 @@ export default function AnalysisPage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/10 bg-[#080812]/70 p-5 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-7">
+          <div className="rounded-2xl border border-slate-800 bg-[#0b1220]/80 p-5 shadow-xl shadow-black/20 backdrop-blur-xl sm:p-6">
           {activeStep === "overview" && (
             <section>
               <SectionHeader eyebrow="Opportunity Readiness Snapshot" title={`${repo.fullName} for ${targetJob.title}`} text="A fast executive view of what the public repository proves, where visibility is missing, and what ProjectDNA generated next." />
+              <StepHelp>Start here to understand your current match, potential match, and overall readiness.</StepHelp>
               {analysis.confidence < 40 && <div className="mb-6 rounded-xl border border-amber-400/25 bg-amber-400/[0.07] px-5 py-4 text-sm text-amber-200">Low confidence: ProjectDNA only found limited public evidence in this repository.</div>}
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-3xl border border-violet-400/20 bg-violet-400/[0.045] p-6"><p className="text-xs text-slate-500">Current Match Score</p><p className="mt-3 text-5xl font-semibold text-white">{target.matchScore}%</p><p className="mt-2 text-xs capitalize text-violet-200">{target.readinessLevel} readiness</p></div>
-                <div className="rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.045] p-6"><p className="text-xs text-slate-500">Potential Match Score</p><p className="mt-3 text-5xl font-semibold text-white">{dynamicProjectedScore}%</p><p className="mt-2 text-xs text-emerald-200">+{unlockable} points unlockable</p></div>
-                <div className="rounded-3xl border border-cyan-400/20 bg-cyan-400/[0.045] p-6"><p className="text-xs text-slate-500">Opportunity Gap</p><p className="mt-3 text-5xl font-semibold text-white">{overlookedMeter.opportunityGap > 0 ? "+" : ""}{overlookedMeter.opportunityGap}</p><p className="mt-2 text-xs text-cyan-200">{overlookedMeter.classification}</p></div>
-                <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6"><p className="text-xs text-slate-500">Readiness Level</p><p className="mt-3 text-3xl font-semibold capitalize text-white">{target.readinessLevel}</p><p className="mt-2 text-xs text-slate-500">{analysis.confidence}% analysis confidence</p></div>
+                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4"><p className="text-xs text-slate-500">Current match</p><p className="mt-2 text-3xl font-semibold text-white">{target.matchScore}%</p><p className="mt-1 text-xs capitalize text-blue-200">{target.readinessLevel} readiness</p></div>
+                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4"><p className="text-xs text-slate-500">Potential match</p><p className="mt-2 text-3xl font-semibold text-white">{dynamicProjectedScore}%</p><p className="mt-1 text-xs text-emerald-200">+{unlockable} points</p></div>
+                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4"><p className="text-xs text-slate-500">Opportunity gap</p><p className="mt-2 text-3xl font-semibold text-white">{overlookedMeter.opportunityGap > 0 ? "+" : ""}{overlookedMeter.opportunityGap}</p><p className="mt-1 text-xs text-blue-200">{overlookedMeter.classification}</p></div>
+                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4"><p className="text-xs text-slate-500">Confidence</p><p className="mt-2 text-3xl font-semibold text-white">{analysis.confidence}%</p><p className="mt-1 text-xs text-slate-500">{analysis.domainClassification.primaryDomain}</p></div>
               </div>
-              <div className="mt-6 rounded-3xl border border-white/10 bg-gradient-to-r from-violet-500/[0.08] via-cyan-500/[0.04] to-emerald-500/[0.06] p-6">
+              <div className="mt-5 rounded-2xl border border-slate-800 bg-slate-950/60 p-5">
                 <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                  <div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">From hidden work to visible opportunity</p><h3 className="mt-2 text-2xl font-semibold text-white">ProjectDNA evidence flow</h3></div>
+                  <div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">Evidence flow</p><h3 className="mt-1 text-xl font-semibold text-white">From repo signals to a packet</h3></div>
                   <p className="text-xs text-slate-500">Repository signals become a recruiter-ready packet.</p>
                 </div>
                 <div className="grid gap-3 lg:grid-cols-5">
@@ -477,8 +485,8 @@ export default function AnalysisPage() {
                     ["Build Plan", portfolioProject.difficulty],
                     ["Evidence Packet", "Ready"],
                   ].map(([label, metric], index) => (
-                    <div key={label} className="relative rounded-2xl border border-white/10 bg-black/25 p-4">
-                      {index < 4 && <div className="absolute left-full top-1/2 hidden h-px w-3 bg-cyan-400/30 lg:block" />}
+                    <div key={label} className="relative rounded-xl border border-slate-800 bg-[#0b1220] p-3">
+                      {index < 4 && <div className="absolute left-full top-1/2 hidden h-px w-3 bg-slate-700 lg:block" />}
                       <p className="text-sm font-semibold text-white">{label}</p>
                       <p className="mt-2 text-xs text-slate-500">{metric}</p>
                     </div>
@@ -497,6 +505,7 @@ export default function AnalysisPage() {
           {activeStep === "skills" && (
             <section>
               <SectionHeader eyebrow="Skill DNA" title="Repo-derived capability signals" text="Filter by category, then open a skill to inspect the evidence lines and source files that support it." />
+              <StepHelp>Review the skills ProjectDNA found from your public repo. Expand a skill to see evidence and source files.</StepHelp>
               <SkillDnaMap skills={analysis.detectedSkills} />
               <div className="mt-6"><SkillRadar skills={analysis.detectedSkills} /></div>
               <div className="mt-6 flex flex-wrap gap-2">
@@ -511,6 +520,7 @@ export default function AnalysisPage() {
           {activeStep === "fit" && (
             <section>
               <SectionHeader eyebrow="Opportunity Fit" title={`${target.matchScore}% match for ${target.title}`} text="The score is calculated from seeded role requirements, detected repo skills, evidence strength, domain alignment, and project complexity." />
+              <StepHelp>See why your repo matches or misses the selected role. Focus on low scoring breakdown areas.</StepHelp>
               <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
                 <div className="rounded-3xl border border-white/10 bg-[#0d0d16]/85 p-6">
                   <h3 className="text-lg font-semibold text-white">Matched requirement table</h3>
@@ -558,6 +568,7 @@ export default function AnalysisPage() {
           {activeStep === "gaps" && (
             <section>
               <SectionHeader eyebrow="Gap Map" title="The bridge from current proof to target opportunity" text={opportunity.gapAnalysis.overallAdvice} />
+              <StepHelp>Use this bridge to understand what evidence you already have, what is missing, and what to build next.</StepHelp>
               <div className="mb-6 grid gap-3 md:grid-cols-2">
                 <div className="rounded-2xl border border-rose-400/20 bg-rose-400/[0.045] p-5 text-sm leading-6 text-rose-100">This is where social capital usually fills the gap.</div>
                 <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.045] p-5 text-sm leading-6 text-emerald-100">ProjectDNA replaces that with a buildable evidence path.</div>
@@ -590,6 +601,7 @@ export default function AnalysisPage() {
           {activeStep === "build" && (
             <section>
               <SectionHeader eyebrow="Build Plan" title={portfolioProject.title} text={portfolioProject.summary} />
+              <StepHelp>Treat this as your next portfolio mission. Tick items as you complete them.</StepHelp>
               <div className="relative overflow-hidden rounded-3xl border border-fuchsia-400/25 bg-[#0c0912] p-6 shadow-[0_0_80px_rgba(168,85,247,0.1)] sm:p-8">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_90%_0%,rgba(34,211,238,0.12),transparent_32%),radial-gradient(circle_at_10%_10%,rgba(192,38,211,0.13),transparent_38%)]" />
                 <div className="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -625,6 +637,7 @@ export default function AnalysisPage() {
           {activeStep === "lab" && (
             <section>
               <SectionHeader eyebrow="Opportunity Lab" title="Simulate the next opportunity unlock" text="This lab turns the current ProjectDNA analysis into a forward-looking simulator: what improves, what remains hidden, and how a recruiter might read the evidence." />
+              <StepHelp>Toggle improvements to simulate how your match score can increase after adding missing evidence.</StepHelp>
               <div className="mb-6 grid gap-4 md:grid-cols-3">
                 <MetricCard label="Current Match" value={`${simulator.currentScore}%`} detail={target.readinessLevel} />
                 <MetricCard label="Potential Match" value={`${dynamicProjectedScore}%`} detail={dynamicProjectedScore >= 75 ? "Strong Potential" : "Evidence still developing"} />
@@ -715,8 +728,8 @@ export default function AnalysisPage() {
           {activeStep === "packet" && (
             <section>
               <SectionHeader eyebrow="Evidence Packet" title={evidencePacket.headline} text={evidencePacket.summary} />
+              <StepHelp>Copy this summary or open the formal report when applying or asking for referrals.</StepHelp>
               {copyError && <p role="alert" className="mb-4 text-sm text-rose-400">{copyError}</p>}
-              <div className="mb-6 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.045] p-5 text-lg font-medium text-cyan-50">Send this instead of relying on a referral.</div>
               <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
                 <div className="rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-[#0c1118] to-[#0c0a14] p-6 sm:p-8">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">Recruiter pitch</p>
