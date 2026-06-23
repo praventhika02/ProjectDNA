@@ -163,8 +163,15 @@ function scoreJob(job: SeedJob, input: MatcherInput): OpportunityMatch {
   const evidenceStrength = uniqueMatches.length ? Math.round(uniqueMatches.reduce((sum, match) => sum + match.strength, 0) / uniqueMatches.length) : 0;
   const alignment = domainScore(job, input.domainClassification);
   const complexity = complexityScore(input.projectComplexity);
-  const matchScore = Math.round(required.coverage * 0.45 + preferred.coverage * 0.2 + evidenceStrength * 0.2 + alignment * 0.1 + complexity * 0.05);
-  const explanation = `${Math.round(required.coverage)}% required-skill coverage and ${Math.round(preferred.coverage)}% preferred-skill coverage, supported by ${evidenceStrength}% evidence strength. Domain alignment is ${alignment}%.`;
+  const scoreBreakdown = {
+    requiredSkillCoverage: Math.round(required.coverage),
+    preferredSkillCoverage: Math.round(preferred.coverage),
+    evidenceStrength,
+    domainAlignment: alignment,
+    complexityRelevance: complexity,
+  };
+  const matchScore = Math.round(scoreBreakdown.requiredSkillCoverage * 0.45 + scoreBreakdown.preferredSkillCoverage * 0.2 + evidenceStrength * 0.2 + alignment * 0.1 + complexity * 0.05);
+  const explanation = `${scoreBreakdown.requiredSkillCoverage}% required-skill coverage and ${scoreBreakdown.preferredSkillCoverage}% preferred-skill coverage, supported by ${evidenceStrength}% evidence strength. Domain alignment is ${alignment}%.`;
   return {
     jobId: job.id,
     title: job.title,
@@ -175,6 +182,7 @@ function scoreJob(job: SeedJob, input: MatcherInput): OpportunityMatch {
     missingRequiredSkills: required.missing,
     missingPreferredSkills: preferred.missing,
     evidenceStrength,
+    scoreBreakdown,
     explanation,
   };
 }

@@ -63,6 +63,14 @@ export interface MatchedSkill {
   sourceFiles: string[];
 }
 
+export interface ScoreBreakdown {
+  requiredSkillCoverage: number;
+  preferredSkillCoverage: number;
+  evidenceStrength: number;
+  domainAlignment: number;
+  complexityRelevance: number;
+}
+
 export interface OpportunityMatch {
   jobId: string;
   title: string;
@@ -73,6 +81,7 @@ export interface OpportunityMatch {
   missingRequiredSkills: string[];
   missingPreferredSkills: string[];
   evidenceStrength: number;
+  scoreBreakdown: ScoreBreakdown;
   explanation: string;
 }
 

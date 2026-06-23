@@ -80,7 +80,7 @@ export default function LatestReportPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">ProjectDNA Evidence Packet</p>
           <h1 className="mt-5 text-3xl font-semibold">No report found.</h1>
           <p className="mt-4 text-sm leading-6 text-slate-400">Run an analysis first, then choose View Evidence Report to save it in this browser.</p>
-          <Link href="/" className="mt-7 inline-flex rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-violet-100">Back to Analyzer</Link>
+          <Link href="/" className="mt-7 inline-flex rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-violet-100">Back to Landing</Link>
         </div>
       </main>
     );
@@ -97,7 +97,7 @@ export default function LatestReportPage() {
       <header className="relative z-10 border-b border-white/10">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-5">
           <Link href="/" className="text-sm font-semibold tracking-wide text-white">ProjectDNA</Link>
-          <div className="flex items-center gap-2"><Link href="/" className="rounded-xl border border-white/10 px-4 py-2 text-xs text-slate-300 transition hover:bg-white/5">Back to Analyzer</Link><button type="button" onClick={copySummary} className="rounded-xl bg-white px-4 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-100">{copied ? "Summary copied" : "Copy Summary"}</button></div>
+          <div className="flex items-center gap-2"><Link href="/analysis" className="rounded-xl border border-white/10 px-4 py-2 text-xs text-slate-300 transition hover:bg-white/5">Interactive Workspace</Link><button type="button" onClick={copySummary} className="rounded-xl bg-white px-4 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-100">{copied ? "Summary copied" : "Copy Summary"}</button></div>
         </div>
       </header>
 
@@ -147,7 +147,7 @@ export default function LatestReportPage() {
           <Section eyebrow="Credibility Notes" title="How to interpret this packet"><EvidenceList items={evidencePacket.credibilityNotes} empty="No credibility notes available." /></Section>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-8"><p className="text-xs text-slate-600">Stored locally in this browser. Refreshing this page keeps the latest saved report.</p><div className="flex gap-2"><Link href="/" className="rounded-xl border border-white/10 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5">Back to Analyzer</Link><button type="button" onClick={copySummary} className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 hover:bg-cyan-100">{copied ? "Summary copied" : "Copy Summary"}</button></div></div>
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-8"><p className="text-xs text-slate-600">Stored locally in this browser. Refreshing this page keeps the latest saved report.</p><div className="flex gap-2"><Link href="/analysis" className="rounded-xl border border-white/10 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5">Interactive Workspace</Link><button type="button" onClick={copySummary} className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 hover:bg-cyan-100">{copied ? "Summary copied" : "Copy Summary"}</button></div></div>
       </div>
     </main>
   );
