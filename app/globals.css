@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 * {
@@ -17,11 +17,11 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 16% 12%, rgba(8, 145, 178, 0.12), transparent 24rem),
-    radial-gradient(circle at 86% 18%, rgba(79, 70, 229, 0.10), transparent 24rem),
-    radial-gradient(circle at 50% 95%, rgba(15, 118, 110, 0.10), transparent 28rem),
-    linear-gradient(135deg, #eef4ff 0%, #f4f7fb 48%, #edf7f6 100%);
-  color: #0f172a;
+    radial-gradient(circle at 14% 18%, rgba(34, 211, 238, 0.16), transparent 24rem),
+    radial-gradient(circle at 82% 14%, rgba(139, 92, 246, 0.16), transparent 26rem),
+    radial-gradient(circle at 50% 92%, rgba(52, 211, 153, 0.10), transparent 30rem),
+    linear-gradient(135deg, #060b1a 0%, #101b3d 48%, #102a43 100%);
+  color: #f8fafc;
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -31,15 +31,15 @@ body::before {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
   background-size: 32px 32px;
   mask-image: linear-gradient(to bottom, black, transparent 85%);
 }
 
 ::selection {
-  background: rgba(79, 70, 229, 0.18);
-  color: #0f172a;
+  background: rgba(34, 211, 238, 0.28);
+  color: #060b1a;
 }
 
 @keyframes shimmer {
@@ -50,3 +50,6 @@ body::before {
 .animate-shimmer {
   animation: shimmer 1.4s infinite;
 }
+
+
+
