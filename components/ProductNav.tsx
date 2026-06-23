@@ -64,7 +64,11 @@ export function ProductNav({ activeStep, onStepChange }: ProductNavProps) {
                       : "border-white/10 bg-white/[0.04] text-slate-400"
                 }`}
               >
-                {isComplete ? "✓" : step.icon} · {step.shortLabel}
+                <span className="inline-flex items-center gap-1.5">
+                  {isComplete ? <CheckMark /> : step.icon}
+                  <span aria-hidden="true">-</span>
+                  {step.shortLabel}
+                </span>
               </button>
             );
           })}
