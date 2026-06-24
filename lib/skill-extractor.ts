@@ -89,6 +89,14 @@ function clamp(value: number): number {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
+function confidenceCap(strength: number, evidenceCount: number): number {
+  if (strength >= 24 && evidenceCount >= 4) return 94;
+  if (strength >= 16 && evidenceCount >= 3) return 89;
+  if (strength >= 10 && evidenceCount >= 2) return 82;
+  if (strength >= 5) return 72;
+  return 58;
+}
+
 function addSignal(map: Map<string, AccumulatedSkill>, skill: string, category: SkillCategory, strength: number, evidence: string, sourceFiles: string[] = []) {
   const current = map.get(skill) ?? { skill, category, strength: 0, evidence: [], sourceFiles: new Set<string>() };
   current.strength += strength;
@@ -254,7 +262,7 @@ export function extractSkills(input: ExtractorInput): DeterministicAnalysis {
     }
     const exactCount = extensionCounts.get(language.extension);
     const selectedPaths = input.files.filter((file) => file.path.toLowerCase().endsWith(language.extension)).map((file) => file.path);
-    if (exactCount) addSignal(skills, language.skill, "language", Math.min(5, 2 + exactCount / 3), `Found ${exactCount} ${language.extension} file${exactCount === 1 ? "" : "s"} in the analyzable tree`, selectedPaths.slice(0, 5));
+    if (exactCount) addSignal(skills, language.skill, "language", Math.min(10, 2 + Math.log10(exactCount + 1) * 2), `Found ${exactCount} ${language.extension} file${exactCount === 1 ? "" : "s"} in the analyzable tree`, selectedPaths.slice(0, 5));
     else if (selectedPaths.length) addSignal(skills, language.skill, "language", 2 + selectedPaths.length, `Selected ${selectedPaths.length} ${language.extension} evidence file${selectedPaths.length === 1 ? "" : "s"}`, selectedPaths.slice(0, 5));
   }
 
@@ -278,8 +286,9 @@ export function extractSkills(input: ExtractorInput): DeterministicAnalysis {
   const detectedSkills: SkillEvidence[] = [...skills.values()]
     .map((item) => {
       const sourceFiles = [...item.sourceFiles];
-      const proficiency = item.strength >= 22 && sourceFiles.length >= 5 ? 5 : item.strength >= 14 && sourceFiles.length >= 3 ? 4 : item.strength >= 8 ? 3 : item.strength >= 4 ? 2 : 1;
-      const confidence = clamp(18 + item.strength * 5 + Math.min(item.evidence.length, 4) * 4 + Math.min(sourceFiles.length, 5) * 3);
+      const proficiency = item.strength >= 24 && sourceFiles.length >= 5 ? 5 : item.strength >= 16 && sourceFiles.length >= 3 ? 4 : item.strength >= 9 ? 3 : item.strength >= 5 ? 2 : 1;
+      const rawConfidence = 22 + item.strength * 3.1 + Math.min(item.evidence.length, 4) * 3 + Math.min(sourceFiles.length, 5) * 2;
+      const confidence = Math.min(confidenceCap(item.strength, item.evidence.length), clamp(rawConfidence));
       const reasoning = proficiency <= 1 ? "A weak public mention was found; implementation evidence is limited." : proficiency === 2 ? "A dependency, primary-language signal, or isolated implementation path supports this skill." : proficiency === 3 ? "Multiple independent repository signals support practical usage." : proficiency === 4 ? "Evidence appears across several files or strong project structures." : "Repeated implementation plus broad project structure indicates advanced usage.";
       return { skill: item.skill, category: item.category, proficiency, confidence, evidence: item.evidence.slice(0, 4), sourceFiles: sourceFiles.slice(0, 6), reasoning };
     })

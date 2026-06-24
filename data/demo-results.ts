@@ -97,14 +97,14 @@ const expressFiles = [
 
 const expressAnalysis: DeterministicAnalysis = {
   detectedSkills: [
-    skill("JavaScript", "language", 97, 4, ["GitHub identifies JavaScript as the repository's primary language", "Found 155 .js files in the analyzable tree"], ["index.js", "lib/application.js", "lib/express.js"]),
-    skill("Express", "backend", 91, 4, ["lib/express.js contains Express implementation patterns", "Found Express-related paths under lib/"], ["lib/express.js", "lib/application.js"]),
-    skill("Node.js", "backend", 88, 3, ["Public README mentions Node.js", "index.js uses Node.js module patterns"], ["Readme.md", "index.js"]),
-    skill("REST API", "backend", 86, 3, ["Route and HTTP handling structures appear in selected Express source files"], ["lib/application.js", "lib/request.js", "lib/response.js"]),
-    skill("Unit testing", "testing", 92, 4, ["Found test-related paths and executable test structures"], ["test/app.js"]),
-    skill("GitHub Actions", "devops", 89, 3, ["Found GitHub Actions workflow paths"], [".github/workflows/ci.yml"]),
-    skill("CI/CD", "devops", 86, 3, ["Found CI workflow configuration under .github/workflows"], [".github/workflows/ci.yml"]),
-    skill("README documentation", "product", 78, 3, ["README contains structured public project documentation"], ["Readme.md"]),
+    skill("JavaScript", "language", 88, 4, ["GitHub identifies JavaScript as the repository's primary language", "Found 155 .js files in the analyzable tree"], ["index.js", "lib/application.js", "lib/express.js"]),
+    skill("Express", "backend", 84, 4, ["lib/express.js contains Express implementation patterns", "Found Express-related paths under lib/"], ["lib/express.js", "lib/application.js"]),
+    skill("Node.js", "backend", 76, 3, ["Public README mentions Node.js", "index.js uses Node.js module patterns"], ["Readme.md", "index.js"]),
+    skill("REST API", "backend", 79, 3, ["Route and HTTP handling structures appear in selected Express source files"], ["lib/application.js", "lib/request.js", "lib/response.js"]),
+    skill("Unit testing", "testing", 82, 4, ["Found test-related paths and executable test structures"], ["test/app.js"]),
+    skill("GitHub Actions", "devops", 74, 3, ["Found GitHub Actions workflow paths"], [".github/workflows/ci.yml"]),
+    skill("CI/CD", "devops", 72, 3, ["Found CI workflow configuration under .github/workflows"], [".github/workflows/ci.yml"]),
+    skill("README documentation", "product", 68, 3, ["README contains structured public project documentation"], ["Readme.md"]),
   ],
   qualitySignals: [
     quality("Documentation quality", 82, "README includes structured usage and setup guidance", ["Readme.md"]),
@@ -116,7 +116,7 @@ const expressAnalysis: DeterministicAnalysis = {
   ],
   projectComplexity: { level: "advanced", score: 76, reasons: ["8 evidence files selected from 213 repository files", "Backend, testing, and DevOps signals span multiple project areas"] },
   domainClassification: { primaryDomain: "Backend", secondaryDomains: ["Product Engineering"], reasons: ["Strongest evidence cluster: Express, Node.js, REST API", "Backend signals score higher than other detected domains"] },
-  confidence: 94,
+  confidence: 86,
 };
 
 const nextFiles = [
@@ -132,16 +132,16 @@ const nextFiles = [
 
 const nextAnalysis: DeterministicAnalysis = {
   detectedSkills: [
-    skill("TypeScript", "language", 98, 5, ["Found 4,602 .ts files in the analyzable tree", "Selected TypeScript source spans server and client paths"], ["packages/next/src/server/next-server.ts", "packages/next/src/client/index.tsx"]),
-    skill("React", "framework", 96, 4, ["Detected React dependency and component implementation paths"], ["packages/next/package.json", "examples/hello-world/app/page.tsx"]),
-    skill("Next.js", "framework", 97, 5, ["README mentions Next.js", "App Router and Next.js server paths appear across the repository"], ["readme.md", "packages/next/src/server/next-server.ts"]),
-    skill("JavaScript", "language", 94, 4, ["GitHub identifies JavaScript as the snapshot's primary repository language"], ["packages/next/package.json"]),
-    skill("HTML", "frontend", 84, 3, ["Selected component files contain semantic interface structures"], ["examples/hello-world/app/page.tsx"]),
-    skill("CSS", "frontend", 82, 3, ["Frontend examples include styling evidence"], ["examples/hello-world/app/page.tsx"]),
-    skill("Jest", "testing", 93, 4, ["Test dependencies and test paths are present"], ["packages/next/package.json", "test/e2e/app-dir/app/index.test.ts"]),
-    skill("GitHub Actions", "devops", 92, 4, ["Found build and test workflow configuration"], [".github/workflows/build_and_test.yml"]),
-    skill("Rust", "language", 90, 4, ["Found 996 .rs files in the analyzable tree"], ["crates/next-api/src/app.rs"]),
-    skill("README documentation", "product", 76, 3, ["README contains public project and setup documentation"], ["readme.md"]),
+    skill("TypeScript", "language", 89, 4, ["Found 4,602 .ts files in the analyzable tree", "Selected TypeScript source spans server and client paths"], ["packages/next/src/server/next-server.ts", "packages/next/src/client/index.tsx"]),
+    skill("React", "framework", 82, 4, ["Detected React dependency and component implementation paths"], ["packages/next/package.json", "examples/hello-world/app/page.tsx"]),
+    skill("Next.js", "framework", 87, 4, ["README mentions Next.js", "App Router and Next.js server paths appear across the repository"], ["readme.md", "packages/next/src/server/next-server.ts"]),
+    skill("JavaScript", "language", 78, 3, ["GitHub identifies JavaScript as the snapshot's primary repository language"], ["packages/next/package.json"]),
+    skill("HTML", "frontend", 67, 2, ["Selected component files contain semantic interface structures"], ["examples/hello-world/app/page.tsx"]),
+    skill("CSS", "frontend", 65, 2, ["Frontend examples include styling evidence"], ["examples/hello-world/app/page.tsx"]),
+    skill("Jest", "testing", 83, 4, ["Test dependencies and test paths are present"], ["packages/next/package.json", "test/e2e/app-dir/app/index.test.ts"]),
+    skill("GitHub Actions", "devops", 79, 3, ["Found build and test workflow configuration"], [".github/workflows/build_and_test.yml"]),
+    skill("Rust", "language", 76, 3, ["Found 996 .rs files in the analyzable tree"], ["crates/next-api/src/app.rs"]),
+    skill("README documentation", "product", 66, 3, ["README contains public project and setup documentation"], ["readme.md"]),
   ],
   qualitySignals: [
     quality("Documentation quality", 80, "README includes project orientation and setup guidance", ["readme.md"]),
@@ -153,7 +153,7 @@ const nextAnalysis: DeterministicAnalysis = {
   ],
   projectComplexity: { level: "intermediate", score: 68, reasons: ["8 representative evidence files selected from a very large recursive tree", "Frontend, testing, DevOps, and systems-language signals are present"] },
   domainClassification: { primaryDomain: "Frontend", secondaryDomains: ["Product Engineering"], reasons: ["Strongest evidence cluster: React, Next.js, TypeScript", "Frontend signals score higher than other detected domains"] },
-  confidence: 95,
+  confidence: 88,
 };
 
 const helloAnalysis: DeterministicAnalysis = {

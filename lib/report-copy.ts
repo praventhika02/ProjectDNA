@@ -39,11 +39,11 @@ export function buildReadablePacket(report: AnalyzeSuccessResponse): ReadablePac
   const skillText = list(topSkillNames, "inspectable engineering evidence");
   const missingText = list(missing, "more measurable public proof");
 
-  const headline = `${report.repo.name} → ${report.targetJob.title}`;
+  const headline = `${report.repo.name} -> ${report.targetJob.title}`;
   const verdict = `${scoreLabel}: ${target.matchScore}% match with visible ${skillText} evidence.`;
   const recruiterPitch = `${report.repo.fullName} shows ${skillText}. ProjectDNA maps that repo evidence to ${matched.length}/${report.targetJob.requiredSkills.length} core role requirements, with the next build focused on ${missingText}.`;
   const nextMove = `${report.portfolioProject.title}: build this to add ${missingText}.`;
-  const differentiator = "ProjectDNA is not a resume summary. It shows what the repo proves, what is missing, and the next artifact to build.";
+  const differentiator = "ProjectDNA is mission control for opportunity access: it turns repo evidence into a recruiter view, an opportunity gap, and the fastest next build.";
 
   const proofBullets = [
     topSkillNames.length ? `Strongest signals: ${skillText}.` : "Limited public skill signals found.",
