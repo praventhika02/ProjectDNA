@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "clean:next": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"if (Test-Path .next) { Remove-Item .next -Recurse -Force }\"",
+    "dev": "npm run clean:next && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

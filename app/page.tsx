@@ -105,17 +105,17 @@ export default function LandingPage() {
   }));
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#060B1A_0%,#101B3D_48%,#102A43_100%)] text-slate-100">
+    <main className="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#050816_0%,#0B1026_42%,#102A43_100%)] text-slate-100">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(34,211,238,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.04)_1px,transparent_1px)] bg-[size:36px_36px]" />
       <div className="pointer-events-none absolute -left-36 top-20 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
       <div className="pointer-events-none absolute right-0 top-10 h-96 w-96 rounded-full bg-violet-500/20 blur-3xl" />
 
       <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-        <span className="text-sm font-semibold text-slate-50">ProjectDNA Studio</span>
-        <a href="#scan" className="rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-white/[0.10]">Scan repo</a>
+        <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-sm font-semibold text-slate-50 shadow-lg shadow-cyan-950/20 backdrop-blur-xl">ProjectDNA Studio</span>
+        <a href="#scan" className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-xs font-semibold text-cyan-100 hover:bg-cyan-300/15">Scan repo</a>
       </header>
 
-      <section id="scan" className="relative z-10 mx-auto grid max-w-7xl gap-8 px-6 py-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:py-16">
+      <section id="scan" className="relative z-10 mx-auto grid max-w-7xl gap-8 px-6 py-8 lg:min-h-[calc(100vh-92px)] lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:py-10">
         <div>
           <p className="w-fit rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 font-mono text-xs uppercase tracking-[0.2em] text-cyan-100">Evidence-first career engine</p>
           <h1 className="mt-5 max-w-3xl text-5xl font-semibold tracking-tight text-slate-50 md:text-7xl">
@@ -125,7 +125,7 @@ export default function LandingPage() {
             ProjectDNA turns it into opportunity evidence.
           </p>
           <p className="mt-5 max-w-xl text-base leading-7 text-slate-300">
-            Scan a public repo, see your role fit, and get a build plan to unlock the next opportunity.
+            Scan a public repo, see your role fit, and get a build mission to close the gap.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
             {["Live GitHub scan", "No paid AI API", "Role-fit scoring"].map((chip) => (
@@ -151,11 +151,11 @@ export default function LandingPage() {
       </section>
 
       <section className="relative z-10 mx-auto max-w-7xl px-6 pb-14">
-        <h2 className="mb-4 text-xl font-semibold text-slate-50">From repo to opportunity in 3 moves</h2>
+        <h2 className="mb-4 text-xl font-semibold text-slate-50">From repo to opportunity</h2>
         <div className="grid gap-4 md:grid-cols-3">
-          <PipelineCard step="01" title="Detect proof" text="Find repo-derived skill signals." />
+          <PipelineCard step="01" title="Reveal proof" text="Find repo-derived skill signals." />
           <PipelineCard step="02" title="Score fit" text="Compare against role requirements." />
-          <PipelineCard step="03" title="Unlock plan" text="Build the missing evidence." />
+          <PipelineCard step="03" title="Unlock role" text="Build the missing evidence." />
         </div>
       </section>
     </main>
@@ -164,7 +164,7 @@ export default function LandingPage() {
 
 function PipelineCard({ step, title, text }: { step: string; title: string; text: string }) {
   return (
-    <div className="rounded-[2rem] border border-white/10 bg-white/[0.06] p-5 backdrop-blur-xl">
+    <div className="rounded-2xl border border-white/10 bg-white/[0.065] p-5 shadow-xl shadow-cyan-950/10 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-cyan-300/25 hover:bg-white/[0.09]">
       <span className="font-mono text-xs text-cyan-200">{step}</span>
       <h3 className="mt-3 text-xl font-semibold text-slate-50">{title}</h3>
       <p className="mt-2 text-sm text-slate-400">{text}</p>

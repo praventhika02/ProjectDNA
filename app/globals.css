@@ -23,6 +23,7 @@ body {
     linear-gradient(135deg, #060b1a 0%, #101b3d 48%, #102a43 100%);
   color: #f8fafc;
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  text-rendering: geometricPrecision;
 }
 
 body::before {
@@ -51,5 +52,12 @@ body::before {
   animation: shimmer 1.4s infinite;
 }
 
+@keyframes soft-pulse {
+  0%, 100% { opacity: 0.55; transform: scaleX(0.98); }
+  50% { opacity: 1; transform: scaleX(1); }
+}
 
+.animate-soft-pulse {
+  animation: soft-pulse 2.8s ease-in-out infinite;
+}
 
