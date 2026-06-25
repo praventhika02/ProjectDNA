@@ -1,225 +1,343 @@
-# ProjectDNA
+# 🧬 ProjectDNA
 
-## Turn GitHub Work Into Opportunity Evidence
+<h3 align="center">Turn GitHub Work Into Opportunity Evidence.</h3>
 
-ProjectDNA helps students and early-career talent transform their GitHub repositories into clear, evidence-based proof of capability.
+<p align="center">
+ProjectDNA is an evidence-first career intelligence platform that transforms public GitHub repositories into recruiter-ready proof of technical capability.
+</p>
 
-Instead of relying solely on resumes, keywords, or referrals, ProjectDNA analyzes real repository activity, extracts demonstrated skills, evaluates role fit, identifies capability gaps, and generates actionable project recommendations to strengthen a candidate's profile.
+<p align="center">
 
----
+🌐 **Live Demo**
+https://project-dna-omega.vercel.app/
 
-## The Problem
-
-Many opportunities are socially gated.
-
-Students often face a frustrating cycle:
-
-* Need experience to get opportunities
-* Need opportunities to gain experience
-* Strong projects are buried inside GitHub repositories
-* Recruiters rarely have time to inspect technical work deeply
-* Traditional resumes fail to capture demonstrated ability
-
-As a result, talented individuals can be overlooked despite having strong proof of work.
+</p>
 
 ---
 
-## Our Solution
+# 🚀 The Problem
 
-ProjectDNA converts repository evidence into opportunity signals.
+Students spend hundreds of hours learning new technologies, building projects, participating in hackathons, and contributing to open-source software.
 
-A user simply:
+Unfortunately, when applying for internships or entry-level jobs, much of that work is reduced to:
 
-1. Enters a public GitHub repository
-2. Selects a target role
-3. Receives a complete capability analysis
+* A one-page resume
+* A GitHub link recruiters rarely have time to inspect
+* A list of self-declared skills
+* A GPA that says little about practical ability
 
-ProjectDNA then:
+This creates a major disconnect between **what students can actually build** and **what employers are able to evaluate**.
 
-* Extracts technical skills from repository evidence
-* Evaluates role fit
-* Identifies missing signals
+Many talented candidates already possess valuable technical skills, but the evidence is buried inside their repositories, making it difficult for recruiters to discover, interpret, and compare.
+
+ProjectDNA exists to bridge this gap.
+
+---
+
+# 💡 Our Solution
+
+ProjectDNA transforms GitHub repositories into structured, explainable, and recruiter-friendly evidence.
+
+Instead of asking:
+
+> **"What skills do you claim to have?"**
+
+ProjectDNA asks:
+
+> **"What have you already proven through your work?"**
+
+Users simply:
+
+1. Paste a public GitHub repository.
+2. Select a target role.
+3. Receive an evidence-based capability report.
+
+ProjectDNA automatically:
+
+* Extracts demonstrated technical skills
+* Evaluates role readiness
+* Identifies capability gaps
 * Simulates improvement opportunities
+* Recommends the next portfolio project
 * Generates a recruiter-ready evidence packet
 
+Rather than acting as another resume builder, ProjectDNA becomes a career intelligence platform that guides students from **learning → building → improving → earning**.
+
 ---
 
-## Core Workflow
+# ⚡ Why ProjectDNA?
 
-### 1. Proof Discovery
+Traditional career platforms focus on credentials.
 
-ProjectDNA scans:
+ProjectDNA focuses on **evidence.**
+
+| Traditional Approach       | ProjectDNA                      |
+| -------------------------- | ------------------------------- |
+| Resume keywords            | Repository evidence             |
+| Self-declared skills       | Demonstrated capability         |
+| Generic career advice      | Personalized recommendations    |
+| Static portfolios          | Interactive opportunity journey |
+| One-size-fits-all feedback | Role-specific insights          |
+
+---
+
+# 🛠️ Product Journey
+
+ProjectDNA guides users through six evidence-driven stages.
+
+## 🔍 Stage 1 — Repository Analysis
+
+ProjectDNA begins by scanning a public GitHub repository.
+
+Evidence collected includes:
 
 * Repository structure
-* Languages
-* Dependencies
+* Programming languages
 * Frameworks
+* Dependencies
+* Source files
 * Documentation
-* Testing signals
-* CI/CD configuration
+* Testing configuration
+* CI/CD workflows
 * Code patterns
+* Repository metadata
 
-The system converts raw repository evidence into measurable skill signals.
+Every insight produced by ProjectDNA is backed by observable repository evidence.
 
 ---
 
-### 2. Role Fit Analysis
+## 🧬 Stage 2 — Skill DNA Extraction
 
-ProjectDNA compares detected capabilities against role requirements.
+The repository is transformed into a structured capability profile.
+
+ProjectDNA identifies:
+
+* Demonstrated technologies
+* Engineering practices
+* Project quality indicators
+* Repository complexity
+* Domain specialization
+* Confidence levels
+
+Unlike traditional skill assessments, capabilities are inferred from actual work rather than user input.
+
+---
+
+## 🎯 Stage 3 — Role Fit Analysis
+
+Users select a target role.
+
+ProjectDNA compares repository evidence against role expectations to evaluate readiness.
 
 Outputs include:
 
-* Match Score
-* Skill Coverage
+* Overall Match Score
+* Required Skill Coverage
+* Preferred Skill Coverage
 * Evidence Strength
 * Domain Alignment
 * Complexity Relevance
 
-Users immediately understand where they stand.
+This provides a clear understanding of how closely the repository aligns with employer expectations.
 
 ---
 
-### 3. Opportunity Unlock Simulator
+## 📈 Stage 4 — Opportunity Gap Analysis
 
-ProjectDNA does not stop at analysis.
+ProjectDNA identifies the evidence currently missing from the portfolio.
 
-The platform identifies:
+Examples include:
 
-* Missing skills
-* Missing evidence
-* Weak portfolio signals
+* Missing technical capabilities
+* Weak engineering signals
+* Limited testing evidence
+* Missing deployment experience
+* Documentation improvements
+* Architecture maturity
 
-It then projects how specific improvements can increase role readiness.
+Rather than saying:
 
-Users can explore:
+> "Learn another framework."
 
-* Current Score
-* Potential Score
+ProjectDNA explains:
+
+> "Here's the evidence recruiters are likely expecting—and here's what's currently missing."
+
+---
+
+## 🚀 Stage 5 — Opportunity Unlock Simulator
+
+ProjectDNA projects how targeted improvements could strengthen the portfolio.
+
+The simulator visualizes:
+
+* Current Readiness
+* Potential Readiness
+* Opportunity Gap
 * Unlock Actions
-* Improvement Impact
+* Estimated Improvement Impact
+
+This allows users to understand which improvements provide the highest career impact.
 
 ---
 
-### 4. Build Mission Generator
+## 🏗️ Stage 6 — Build Mission Generator
 
-ProjectDNA recommends a targeted portfolio project designed to close capability gaps.
+ProjectDNA recommends a personalized portfolio project specifically designed to strengthen missing capability signals.
 
-Each mission includes:
+Each Build Mission includes:
 
-* Project idea
-* Features
+* Project objective
+* Recommended technologies
+* Core features
+* Stretch goals
 * Success criteria
-* Skills demonstrated
+* Demonstrated skills
 * Recruiter value
 
-This transforms feedback into action.
+Instead of generic learning resources, users receive a practical roadmap tailored to their existing work.
 
 ---
 
-### 5. Recruiter Evidence Packet
+## 📄 Stage 7 — Recruiter Evidence Packet
 
-ProjectDNA automatically generates:
+Finally, ProjectDNA generates a recruiter-friendly evidence report containing:
 
-* Recruiter summary
-* Technical highlights
-* Proof points
-* Risks and gaps
-* Recommended next steps
+* Executive Summary
+* Demonstrated Strengths
+* Technical Highlights
+* Repository Evidence
+* Missing Signals
+* Improvement Roadmap
+* Credibility Notes
 
-This creates a concise artifact that can be shared during applications and interviews.
-
----
-
-## Key Features
-
-### GitHub Repository Analysis
-
-Evidence-first capability extraction from public repositories.
-
-### Skill DNA
-
-Structured capability mapping derived from actual work.
-
-### Role Fit Engine
-
-Deterministic scoring system for evaluating opportunity readiness.
-
-### Opportunity Unlock Simulator
-
-Interactive improvement planning with projected score growth.
-
-### Build Mission Generator
-
-Personalized project recommendations to strengthen portfolios.
-
-### Recruiter Packet
-
-Professional evidence summary generated from repository signals.
+The report can be used during internship applications, interviews, career coaching sessions, or portfolio reviews.
 
 ---
 
-## Technology Stack
+# ✨ Key Features
 
-### Frontend
+✅ Public GitHub Repository Analysis
+
+✅ Evidence-Based Skill Extraction
+
+✅ Repository Quality Assessment
+
+✅ Target Role Matching
+
+✅ Opportunity Gap Analysis
+
+✅ Interactive Readiness Simulator
+
+✅ Personalized Build Mission Generator
+
+✅ Recruiter Evidence Packet
+
+---
+
+# 🏛️ System Architecture
+
+```
+Public GitHub Repository
+            │
+            ▼
+Repository Analysis Engine
+            │
+            ▼
+Evidence Extraction Pipeline
+            │
+            ▼
+Skill Classification Engine
+            │
+            ▼
+Role Matching Engine
+            │
+            ▼
+Opportunity Gap Analysis
+            │
+            ▼
+Opportunity Unlock Simulator
+            │
+            ▼
+Build Mission Generator
+            │
+            ▼
+Recruiter Evidence Packet
+```
+
+---
+
+# ⚙️ Technology Stack
+
+## Frontend
 
 * Next.js
 * React
 * TypeScript
 * Tailwind CSS
 
-### Backend
+## Backend
 
 * Next.js API Routes
+* Node.js
 
-### Data Sources
+## APIs
 
-* GitHub Public API
+* GitHub REST API
 
-### Analysis Engine
+## Core Engine
 
-* Deterministic evidence extraction
-* Skill classification
-* Role-fit scoring
-* Opportunity simulation
-
----
-
-## Why ProjectDNA?
-
-Most platforms ask:
-
-> "What skills do you claim to have?"
-
-ProjectDNA asks:
-
-> "What can you prove?"
-
-By transforming repositories into structured evidence, ProjectDNA helps talented individuals showcase demonstrated capability rather than relying solely on resumes, keywords, or social networks.
+* Deterministic Evidence Extraction
+* Skill Classification
+* Repository Quality Analysis
+* Role Matching
+* Opportunity Gap Analysis
+* Readiness Simulation
+* Build Mission Generation
+* Recruiter Packet Generation
 
 ---
 
-## Future Enhancements
+# 🔮 Current Scope & Future Vision
 
-* Multi-repository analysis
-* GitHub commit history intelligence
-* Team project contribution attribution
-* Portfolio website analysis
-* Internship-specific scoring models
-* Recruiter-facing dashboard
-* PDF export and sharing
+ProjectDNA is currently an MVP focused on validating our evidence-first approach using a curated set of representative roles, including AI Engineer Intern, Frontend Developer, and Backend Developer.
+
+This allowed us to build a transparent, deterministic pipeline that demonstrates repository analysis, capability extraction, role matching, opportunity gap analysis, and personalized recommendations without relying on opaque scoring.
+
+Future enhancements include:
+
+* 🌍 Live job posting analysis via job URLs or uploaded job descriptions
+* 📚 Multi-repository portfolio analysis
+* 📈 GitHub commit history intelligence
+* 👥 Team contribution attribution
+* 🌐 Portfolio website analysis
+* 🎓 Internship and role-specific scoring models
+* 📄 Exportable PDF reports
+* 🤝 Shareable recruiter evidence packets
+* 🧑‍💼 Recruiter-facing dashboards
+* 📊 Longitudinal skill progression tracking
+* 🎯 Personalized learning and career pathways
+
+Our long-term vision is to transform ProjectDNA into a comprehensive career intelligence platform that connects **real-world job requirements** with **demonstrated technical capability**, helping students bridge the gap between learning, portfolio development, and employability.
 
 ---
 
-## Built For
+# 🏆 Hackathon Theme
 
 **Theme B — Work, Income & Capability**
 
-Challenge Alignment:
-ProjectDNA helps convert demonstrated ability into credible opportunity signals, enabling users to showcase proof of work rather than relying solely on traditional credentials or social capital.
+**Challenge Statement #1 — The Broken Bridge from Learning to Earning**
 
 ---
 
-## Team
+# 👥 Team
 
-Triple Helix
+**Triple Helix**
 
+---
+
+# 📜 License
+
+Developed as a hackathon prototype for educational and demonstration purposes.
+
+© 2026 Triple Helix. All rights reserved.
